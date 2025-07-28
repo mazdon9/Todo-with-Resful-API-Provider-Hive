@@ -10,7 +10,7 @@ class todoRestfulApi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Todo with RESTful API',
+      title: 'Todo with RESTful API.',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),

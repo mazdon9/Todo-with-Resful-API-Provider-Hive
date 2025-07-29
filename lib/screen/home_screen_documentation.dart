@@ -51,7 +51,7 @@ class mainScreenDocumentation extends StatelessWidget {
         ],
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 50, right: 22),
+        padding: const EdgeInsets.only(bottom: 60, right: 22),
         child: PhysicalModel(
           color: AppColorsPathPath.lavender,
           elevation: 6,
@@ -81,8 +81,9 @@ class _BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: (68 / 896) * MediaQuery.of(context).size.height,
       decoration: BoxDecoration(color: AppColorsPathPath.white),
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 91, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

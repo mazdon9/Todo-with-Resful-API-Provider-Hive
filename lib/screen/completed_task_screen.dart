@@ -7,7 +7,7 @@ class CompletedTaskScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Completed Tasks')),
-      body: const Center(child: Text('Completed Task Screen')),
+      body: const Center(child: Text('Completed Task Screens')),
     );
   }
 }

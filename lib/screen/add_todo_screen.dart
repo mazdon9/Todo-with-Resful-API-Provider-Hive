@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_with_resfulapi/components/app_button.dart';
 
 class AddTodoScreen extends StatelessWidget {
   const AddTodoScreen({super.key});
@@ -7,7 +8,9 @@ class AddTodoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Add Todo')),
-      body: const Center(child: Text('Add Todo Screen')),
+      body: Center(
+        child: AppButton(content: 'ADD', onTap: () {}),
+      ),
     );
   }
 }

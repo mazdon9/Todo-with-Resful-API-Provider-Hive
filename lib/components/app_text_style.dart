@@ -7,27 +7,41 @@ class AppTextStyle {
     fontFamily: 'Jost',
     fontWeight: FontWeight.w600,
     fontSize: 24,
-    color: AppColorsPathPath.white,
+    color: AppColorsPath.white,
   );
 
   static const TextStyle textFontR10W400 = TextStyle(
     fontFamily: 'Jost-Regular',
     fontWeight: FontWeight.w400,
     fontSize: 10,
-    color: AppColorsPathPath.black,
+    color: AppColorsPath.black,
+  );
+  static const TextStyle textFontR15W400 = TextStyle(
+    fontFamily: 'Jost-Regular',
+    fontWeight: FontWeight.w400,
+    fontSize: 15,
+    color: AppColorsPath.black,
   );
 
   static const TextStyle textFontSM26W600 = TextStyle(
     fontFamily: 'Jost-Semibold',
     fontWeight: FontWeight.w600,
-    fontSize: 24,
-    color: AppColorsPathPath.white,
+    fontSize: 26,
+    color: AppColorsPath.white,
+  );
+  static const TextStyle textFontSM20W600 = TextStyle(
+    fontFamily: 'Jost-Semibold',
+    fontWeight: FontWeight.w600,
+    fontSize: 20,
+    color: AppColorsPath.white,
   );
 
   static const TextStyle textFontSM13W600 = TextStyle(
     fontFamily: 'Jost-Semibold',
     fontWeight: FontWeight.w600,
     fontSize: 13,
-    color: AppColorsPathPath.lavender,
+    color: AppColorsPath.lavender,
   );
+
+  static var textFontM17W500;
 }

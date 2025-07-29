@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_with_resfulapi/routes/app_routes.dart';
 import 'package:todo_with_resfulapi/widget/todo_box_widget_main_screen_documentation.dart';
 
 import '../components/app_text.dart';
@@ -13,9 +14,9 @@ class mainScreenDocumentation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColorsPathPath.lavender,
+      backgroundColor: AppColorsPath.lavender,
       appBar: AppBar(
-        backgroundColor: AppColorsPathPath.lavender,
+        backgroundColor: AppColorsPath.lavender,
         elevation: 0,
         title: AppText(
           title: AppData.appName,
@@ -25,7 +26,7 @@ class mainScreenDocumentation extends StatelessWidget {
           IconButton(
             icon: Icon(
               Icons.calendar_month_outlined,
-              color: AppColorsPathPath.white,
+              color: AppColorsPath.white,
             ),
             onPressed: () {},
           ),
@@ -35,7 +36,7 @@ class mainScreenDocumentation extends StatelessWidget {
         children: [
           Expanded(
             child: Container(
-              decoration: BoxDecoration(color: AppColorsPathPath.lavenderLight),
+              decoration: BoxDecoration(color: AppColorsPath.lavenderLight),
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(
                   vertical: 24,
@@ -53,7 +54,7 @@ class mainScreenDocumentation extends StatelessWidget {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 63, right: 22),
         child: PhysicalModel(
-          color: AppColorsPathPath.lavender,
+          color: AppColorsPath.lavender,
           elevation: 6,
           shape: BoxShape.circle,
 
@@ -61,11 +62,13 @@ class mainScreenDocumentation extends StatelessWidget {
             width: 70,
             height: 70,
             child: FloatingActionButton(
-              backgroundColor: AppColorsPathPath.lavender,
+              backgroundColor: AppColorsPath.lavender,
               elevation: 0,
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, AppRoutes.addTodoScreeRouter);
+              },
               shape: const CircleBorder(),
-              child: Icon(Icons.add, color: AppColorsPathPath.white, size: 36),
+              child: Icon(Icons.add, color: AppColorsPath.white, size: 36),
             ),
           ),
         ),
@@ -82,7 +85,7 @@ class _BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: (68 / 896) * MediaQuery.of(context).size.height,
-      decoration: BoxDecoration(color: AppColorsPathPath.white),
+      decoration: BoxDecoration(color: AppColorsPath.white),
       padding: const EdgeInsets.symmetric(horizontal: 91, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -90,14 +93,14 @@ class _BottomNavBar extends StatelessWidget {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.list_alt, color: AppColorsPathPath.lavender),
+              Icon(Icons.list_alt, color: AppColorsPath.lavender),
               AppText(title: 'All', style: AppTextStyle.textFontR10W400),
             ],
           ),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.check, color: AppColorsPathPath.lavender),
+              Icon(Icons.check, color: AppColorsPath.lavender),
               AppText(title: 'Completed', style: AppTextStyle.textFontR10W400),
             ],
           ),

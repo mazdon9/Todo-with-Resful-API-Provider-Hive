@@ -31,20 +31,17 @@ class TodoBox extends StatelessWidget {
               ),
             ),
             IconButton(
-              icon: Icon(Icons.edit, color: AppColorsPathPath.lavender),
+              icon: Icon(Icons.edit, color: AppColorsPath.lavender),
               onPressed: () {},
             ),
             IconButton(
-              icon: Icon(
-                Icons.delete_outline,
-                color: AppColorsPathPath.lavender,
-              ),
+              icon: Icon(Icons.delete_outline, color: AppColorsPath.lavender),
               onPressed: () {},
             ),
             IconButton(
               icon: Icon(
                 Icons.check_circle_outline,
-                color: AppColorsPathPath.lavender,
+                color: AppColorsPath.lavender,
               ),
               onPressed: () {},
             ),

@@ -1,32 +1,44 @@
 import 'package:flutter/material.dart';
-
-import '../constants/app_color_path.dart';
+import 'package:todo_with_resfulapi/components/app_text.dart';
+import 'package:todo_with_resfulapi/components/app_text_style.dart';
+import 'package:todo_with_resfulapi/constants/app_color_path.dart';
 
 class AppButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  final Widget child;
+  final String content;
+  final VoidCallback onTap;
+  final double? width;
+  final TextStyle? textStyle;
   final Color? color;
   final double borderRadius;
-  final EdgeInsetsGeometry padding;
 
   const AppButton({
-    super.key,
-    required this.onPressed,
-    required this.child,
+    required this.content,
+    required this.onTap,
+    this.width,
+    this.textStyle,
     this.color,
-    this.borderRadius = 16,
-    this.padding = const EdgeInsets.all(16),
+    this.borderRadius = 59,
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: color ?? AppColorsPathPath.lavender,
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(borderRadius),
-        onTap: onPressed,
-        child: Padding(padding: padding, child: child),
+    final size = MediaQuery.of(context).size;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: width ?? (65 / 414) * size.width,
+        height: (width ?? (65 / 414) * size.width),
+        decoration: BoxDecoration(
+          color: color ?? AppColorsPath.lavender,
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+        child: Center(
+          child: AppText(
+            title: content,
+            style: textStyle ?? AppTextStyle.textFontSM20W600,
+          ),
+        ),
       ),
     );
   }

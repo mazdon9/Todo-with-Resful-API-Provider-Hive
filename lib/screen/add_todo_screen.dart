@@ -22,14 +22,14 @@ class AddTodoScreen extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(color: AppColorsPath.white),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 29, vertical: 43),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               AppTextField(hintText: 'Title'),
-              const SizedBox(height: 24),
-              AppTextField(hintText: 'Detail', maxLines: 2),
-              const SizedBox(height: 40),
+              const SizedBox(height: 43),
+              AppTextField(hintText: 'Detail', maxLines: 1),
+              const SizedBox(height: 54),
               Center(
                 child: AppButton(
                   content: 'ADD',

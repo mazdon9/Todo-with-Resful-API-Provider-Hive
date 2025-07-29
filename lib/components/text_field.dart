@@ -27,7 +27,7 @@ class AppTextField extends StatelessWidget {
       maxLines: maxLines,
       keyboardType: keyboardType,
       onChanged: onChanged,
-      style: style ?? AppTextStyle.textFontR15W400,
+      style: style ?? AppTextStyle.textFontR16W400,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: AppTextStyle.textFontR15W400,
@@ -43,7 +43,7 @@ class AppTextField extends StatelessWidget {
             width: 1.2,
           ),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(vertical: 2),
         isDense: true,
       ),
     );

@@ -22,6 +22,12 @@ class AppTextStyle {
     fontSize: 15,
     color: AppColorsPath.black,
   );
+  static const TextStyle textFontR16W400 = TextStyle(
+    fontFamily: 'Jost-Regular',
+    fontWeight: FontWeight.w400,
+    fontSize: 16,
+    color: AppColorsPath.brownlight,
+  );
 
   static const TextStyle textFontSM26W600 = TextStyle(
     fontFamily: 'Jost-Semibold',

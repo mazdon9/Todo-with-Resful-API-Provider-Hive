@@ -43,7 +43,7 @@ class AppTextField extends StatelessWidget {
             width: 1.2,
           ),
         ),
-        // contentPadding: const EdgeInsets.symmetric(vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(vertical: 2),
         isDense: true,
       ),
     );

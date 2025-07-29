@@ -51,12 +51,12 @@ class mainScreenDocumentation extends StatelessWidget {
         ],
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 60, right: 22),
+        padding: const EdgeInsets.only(bottom: 63, right: 22),
         child: PhysicalModel(
           color: AppColorsPathPath.lavender,
           elevation: 6,
           shape: BoxShape.circle,
-          shadowColor: Colors.black26,
+
           child: SizedBox(
             width: 70,
             height: 70,

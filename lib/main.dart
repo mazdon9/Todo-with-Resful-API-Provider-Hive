@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_with_resfulapi/routes/app_routes.dart';
 
 void main() {
   runApp(const todoRestfulApi());
@@ -14,7 +15,8 @@ class todoRestfulApi extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: todoRestfulApi(),
+      initialRoute: AppRoutes.homeScreenRouter,
+      routes: AppRoutes.routes,
     );
   }
 }

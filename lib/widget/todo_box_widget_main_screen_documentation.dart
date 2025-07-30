@@ -10,6 +10,7 @@ class TodoBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: AppColorsPath.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 2,
       child: Padding(

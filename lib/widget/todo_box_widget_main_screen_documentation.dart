@@ -5,6 +5,8 @@ import 'package:todo_with_resfulapi/constants/app_color_path.dart';
 import 'package:todo_with_resfulapi/constants/app_data.dart';
 
 class TodoBox extends StatelessWidget {
+  const TodoBox({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Card(

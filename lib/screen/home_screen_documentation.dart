@@ -6,10 +6,9 @@ import '../components/app_text.dart';
 import '../components/app_text_style.dart';
 import '../constants/app_color_path.dart';
 import '../constants/app_data.dart';
-// import '../components/app_button.dart';
 
-class mainScreenDocumentation extends StatelessWidget {
-  const mainScreenDocumentation({super.key});
+class MainScreenDocumentation extends StatelessWidget {
+  const MainScreenDocumentation({super.key});
 
   @override
   Widget build(BuildContext context) {

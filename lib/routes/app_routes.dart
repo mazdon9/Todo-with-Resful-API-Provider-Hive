@@ -10,7 +10,7 @@ class AppRoutes {
   static const String completedTaskScreenRouter = 'completed-task-screen';
 
   static final routes = {
-    homeScreenRouter: (context) => const mainScreenDocumentation(),
+    homeScreenRouter: (context) => const MainScreenDocumentation(),
     addTodoScreeRouter: (context) => const AddTodoScreen(),
     editTodoScreenRouter: (context) => const EditTodoScreen(),
     completedTaskScreenRouter: (context) => const CompletedTaskScreen(),

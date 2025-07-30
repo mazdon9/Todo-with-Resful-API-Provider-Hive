@@ -33,11 +33,10 @@ class AppButton extends StatelessWidget {
           color: color ?? AppColorsPath.lavender,
           borderRadius: BorderRadius.circular(borderRadius),
         ),
-        child: Center(
-          child: AppText(
-            title: content,
-            style: textStyle ?? AppTextStyle.textFontSM20W600,
-          ),
+        alignment: Alignment.center,
+        child: AppText(
+          title: content,
+          style: textStyle ?? AppTextStyle.textFontSM20W600,
         ),
       ),
     );

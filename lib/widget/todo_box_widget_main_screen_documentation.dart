@@ -2,10 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:todo_with_resfulapi/components/app_text.dart';
 import 'package:todo_with_resfulapi/components/app_text_style.dart';
 import 'package:todo_with_resfulapi/constants/app_color_path.dart';
-import 'package:todo_with_resfulapi/constants/app_data.dart';
+import 'package:todo_with_resfulapi/models/todo_model.dart';
 
 class TodoBox extends StatelessWidget {
-  const TodoBox({super.key});
+  final TodoModel todo;
+  final VoidCallback? onStatusChanged;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  const TodoBox({
+    super.key,
+    required this.todo,
+    this.onStatusChanged,
+    this.onEdit,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,31 +33,43 @@ class TodoBox extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AppText(
-                    title: AppData.todoTitle,
-                    style: AppTextStyle.textFontSM13W600,
+                    title: todo.title,
+                    style: AppTextStyle.textFontSM13W600.copyWith(
+                      decoration: todo.isCompleted
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none,
+                    ),
                   ),
-                  const SizedBox(height: 4),
-                  AppText(
-                    title: AppData.todoSubTitle,
-                    style: AppTextStyle.textFontR10W400,
-                  ),
+                  if (todo.detail.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    AppText(
+                      title: todo.detail,
+                      style: AppTextStyle.textFontR10W400.copyWith(
+                        decoration: todo.isCompleted
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
             IconButton(
               icon: Icon(Icons.edit, color: AppColorsPath.lavender),
-              onPressed: () {},
+              onPressed: onEdit,
             ),
             IconButton(
               icon: Icon(Icons.delete_outline, color: AppColorsPath.lavender),
-              onPressed: () {},
+              onPressed: onDelete,
             ),
             IconButton(
               icon: Icon(
-                Icons.check_circle_outline,
+                todo.isCompleted
+                    ? Icons.check_circle
+                    : Icons.check_circle_outline,
                 color: AppColorsPath.lavender,
               ),
-              onPressed: () {},
+              onPressed: onStatusChanged,
             ),
           ],
         ),

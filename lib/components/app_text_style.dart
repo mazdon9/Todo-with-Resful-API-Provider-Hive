@@ -30,24 +30,29 @@ class AppTextStyle {
   );
 
   static const TextStyle textFontSM26W600 = TextStyle(
-    fontFamily: 'Jost-Semibold',
+    fontFamily: 'Jost',
     fontWeight: FontWeight.w600,
     fontSize: 26,
     color: AppColorsPath.white,
   );
   static const TextStyle textFontSM20W600 = TextStyle(
-    fontFamily: 'Jost-Semibold',
+    fontFamily: 'Jost',
     fontWeight: FontWeight.w600,
     fontSize: 20,
     color: AppColorsPath.white,
   );
 
   static const TextStyle textFontSM13W600 = TextStyle(
-    fontFamily: 'Jost-Semibold',
+    fontFamily: 'Jost',
     fontWeight: FontWeight.w600,
     fontSize: 13,
     color: AppColorsPath.lavender,
   );
 
-  static var textFontM17W500;
+  static const TextStyle textFontM17W500 = TextStyle(
+    fontFamily: 'Jost',
+    fontWeight: FontWeight.w500,
+    fontSize: 17,
+    color: AppColorsPath.black,
+  );
 }

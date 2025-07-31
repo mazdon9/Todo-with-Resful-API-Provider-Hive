@@ -1,14 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:todo_with_resfulapi/components/todo_list_view.dart';
+import 'package:todo_with_resfulapi/models/todo_model.dart';
 import 'package:todo_with_resfulapi/routes/app_routes.dart';
-import 'package:todo_with_resfulapi/widget/todo_box_widget_main_screen_documentation.dart';
 
 import '../components/app_text.dart';
 import '../components/app_text_style.dart';
 import '../constants/app_color_path.dart';
 import '../constants/app_data.dart';
 
-class MainScreenDocumentation extends StatelessWidget {
+class MainScreenDocumentation extends StatefulWidget {
   const MainScreenDocumentation({super.key});
+
+  @override
+  State<MainScreenDocumentation> createState() =>
+      _MainScreenDocumentationState();
+}
+
+class _MainScreenDocumentationState extends State<MainScreenDocumentation> {
+  final List<TodoModel> _todos = [];
+
+  void _onTodoStatusChanged(TodoModel todo) {
+    setState(() {
+      todo.isCompleted = !todo.isCompleted;
+    });
+  }
+
+  void _addNewTodo(TodoModel? todo) {
+    if (todo != null) {
+      setState(() {
+        _todos.add(todo);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +58,12 @@ class MainScreenDocumentation extends StatelessWidget {
         children: [
           Expanded(
             child: Container(
-              decoration: BoxDecoration(color: AppColorsPath.lavenderLight),
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 24,
-                  horizontal: 16,
-                ),
-                itemCount: 4,
-                separatorBuilder: (_, __) => const SizedBox(height: 16),
-                itemBuilder: (context, index) => TodoBox(),
+              decoration: const BoxDecoration(
+                color: AppColorsPath.lavenderLight,
+              ),
+              child: TodoListView(
+                todos: _todos,
+                onTodoStatusChanged: _onTodoStatusChanged,
               ),
             ),
           ),
@@ -63,8 +83,12 @@ class MainScreenDocumentation extends StatelessWidget {
             child: FloatingActionButton(
               backgroundColor: AppColorsPath.lavender,
               elevation: 0,
-              onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.addTodoScreeRouter);
+              onPressed: () async {
+                final result = await Navigator.pushNamed(
+                  context,
+                  AppRoutes.addTodoScreeRouter,
+                );
+                _addNewTodo(result as TodoModel?);
               },
               shape: const CircleBorder(),
               child: Icon(Icons.add, color: AppColorsPath.white, size: 36),

@@ -43,7 +43,7 @@ class MainScreenDocumentation extends StatelessWidget {
                 ),
                 itemCount: 4,
                 separatorBuilder: (_, __) => const SizedBox(height: 16),
-                itemBuilder: (context, index) => TodoBox(),
+                itemBuilder: (context, index) => TodoBox(todo: TodoDetail()),
               ),
             ),
           ),

@@ -1,38 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:todo_with_resfulapi/models/todo_model.dart';
+import 'package:todo_with_resfulapi/components/todo_box_widget.dart';
 import 'package:todo_with_resfulapi/routes/app_routes.dart';
-import 'package:todo_with_resfulapi/widgets/bottom_nav_bar_widget_home_screen.dart';
-import 'package:todo_with_resfulapi/widgets/todo_list.dart';
 
 import '../components/app_text.dart';
 import '../components/app_text_style.dart';
 import '../constants/app_color_path.dart';
 import '../constants/app_data.dart';
 
-class MainScreenDocumentation extends StatefulWidget {
+class MainScreenDocumentation extends StatelessWidget {
   const MainScreenDocumentation({super.key});
-
-  @override
-  State<MainScreenDocumentation> createState() =>
-      _MainScreenDocumentationState();
-}
-
-class _MainScreenDocumentationState extends State<MainScreenDocumentation> {
-  final List<TodoModel> _todos = [];
-
-  void _onTodoStatusChanged(TodoModel todo) {
-    setState(() {
-      todo.isCompleted = !todo.isCompleted;
-    });
-  }
-
-  void _addNewTodo(TodoModel? todo) {
-    if (todo != null) {
-      setState(() {
-        _todos.add(todo);
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,16 +35,19 @@ class _MainScreenDocumentationState extends State<MainScreenDocumentation> {
         children: [
           Expanded(
             child: Container(
-              decoration: const BoxDecoration(
-                color: AppColorsPath.lavenderLight,
-              ),
-              child: TodoListWidget(
-                todos: _todos,
-                onTodoStatusChanged: _onTodoStatusChanged,
+              decoration: BoxDecoration(color: AppColorsPath.lavenderLight),
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24,
+                  horizontal: 16,
+                ),
+                itemCount: 4,
+                separatorBuilder: (_, __) => const SizedBox(height: 16),
+                itemBuilder: (context, index) => TodoBox(),
               ),
             ),
           ),
-          const BottomNavBarWidget(),
+          const _BottomNavBar(),
         ],
       ),
       floatingActionButton: Padding(
@@ -84,12 +63,8 @@ class _MainScreenDocumentationState extends State<MainScreenDocumentation> {
             child: FloatingActionButton(
               backgroundColor: AppColorsPath.lavender,
               elevation: 0,
-              onPressed: () async {
-                final result = await Navigator.pushNamed(
-                  context,
-                  AppRoutes.addTodoScreeRouter,
-                );
-                _addNewTodo(result as TodoModel?);
+              onPressed: () {
+                Navigator.pushNamed(context, AppRoutes.addTodoScreeRouter);
               },
               shape: const CircleBorder(),
               child: Icon(Icons.add, color: AppColorsPath.white, size: 36),
@@ -98,6 +73,38 @@ class _MainScreenDocumentationState extends State<MainScreenDocumentation> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+    );
+  }
+}
+
+class _BottomNavBar extends StatelessWidget {
+  const _BottomNavBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: (68 / 896) * MediaQuery.of(context).size.height,
+      decoration: BoxDecoration(color: AppColorsPath.white),
+      padding: const EdgeInsets.symmetric(horizontal: 91, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.list_alt, color: AppColorsPath.lavender),
+              AppText(title: 'All', style: AppTextStyle.textFontR10W400),
+            ],
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.check, color: AppColorsPath.lavender),
+              AppText(title: 'Completed', style: AppTextStyle.textFontR10W400),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

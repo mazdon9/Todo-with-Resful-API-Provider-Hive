@@ -3,18 +3,22 @@ import 'package:todo_with_resfulapi/components/app_text.dart';
 import 'package:todo_with_resfulapi/components/app_text_style.dart';
 import 'package:todo_with_resfulapi/constants/app_color_path.dart';
 import 'package:todo_with_resfulapi/models/todo_model.dart';
-import 'package:todo_with_resfulapi/widget/todo_box_widget_main_screen_documentation.dart';
+import 'package:todo_with_resfulapi/widgets/todo_box.dart';
 
-class TodoListView extends StatelessWidget {
+class TodoListWidget extends StatelessWidget {
   final List<TodoModel> todos;
   final EdgeInsetsGeometry? padding;
   final Function(TodoModel todo)? onTodoStatusChanged;
+  final Function(TodoModel todo)? onTodoEdit;
+  final Function(TodoModel todo)? onTodoDelete;
 
-  const TodoListView({
+  const TodoListWidget({
     super.key,
     required this.todos,
     this.padding = const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
     this.onTodoStatusChanged,
+    this.onTodoEdit,
+    this.onTodoDelete,
   });
 
   @override
@@ -38,9 +42,9 @@ class TodoListView extends StatelessWidget {
         final todo = todos[index];
         return TodoBox(
           todo: todo,
-          onStatusChanged: () {
-            onTodoStatusChanged?.call(todo);
-          },
+          onStatusChanged: () => onTodoStatusChanged?.call(todo),
+          onEdit: () => onTodoEdit?.call(todo),
+          onDelete: () => onTodoDelete?.call(todo),
         );
       },
     );

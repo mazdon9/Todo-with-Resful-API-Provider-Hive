@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:todo_with_resfulapi/components/app_text.dart';
 import 'package:todo_with_resfulapi/components/app_text_style.dart';
 import 'package:todo_with_resfulapi/constants/app_color_path.dart';
-import 'package:todo_with_resfulapi/models/todo_model.dart';
+import 'package:todo_with_resfulapi/models/task.dart';
 
 class TodoBox extends StatelessWidget {
-  final TodoModel todo;
+  final Task task;
   final VoidCallback? onStatusChanged;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
   const TodoBox({
     super.key,
-    required this.todo,
+    required this.task,
     this.onStatusChanged,
     this.onEdit,
     this.onDelete,
@@ -33,22 +33,24 @@ class TodoBox extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AppText(
-                    title: todo.title,
+                    title: task.title,
                     style: AppTextStyle.textFontSM13W600.copyWith(
-                      decoration: todo.isCompleted
-                          ? TextDecoration.lineThrough
-                          : TextDecoration.none,
+                      decoration:
+                          task.isCompleted
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
                     ),
                   ),
-                  if (todo.detail.isNotEmpty) ...[
+                  if (task.description.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     AppText(
-                      title: todo.detail,
+                      title: task.description,
                       style: AppTextStyle.textFontR10W400.copyWith(
                         color: AppColorsPath.black,
-                        decoration: todo.isCompleted
-                            ? TextDecoration.lineThrough
-                            : TextDecoration.none,
+                        decoration:
+                            task.isCompleted
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none,
                       ),
                     ),
                   ],
@@ -65,7 +67,7 @@ class TodoBox extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(
-                todo.isCompleted
+                task.isCompleted
                     ? Icons.check_circle
                     : Icons.check_circle_outline,
                 color: AppColorsPath.lavender,

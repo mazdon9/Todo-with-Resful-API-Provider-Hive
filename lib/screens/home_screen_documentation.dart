@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:todo_with_resfulapi/routes/app_routes.dart';
-import 'package:todo_with_resfulapi/widget/todo_box_widget_main_screen_documentation.dart';
 
-import '../components/app_text.dart';
-import '../components/app_text_style.dart';
-import '../constants/app_color_path.dart';
-import '../constants/app_data.dart';
+import 'package:todo_with_resfulapi/components/app_text.dart';
+import 'package:todo_with_resfulapi/components/app_text_style.dart';
+import 'package:todo_with_resfulapi/constants/app_color_path.dart';
+import 'package:todo_with_resfulapi/constants/app_data.dart';
+import 'package:todo_with_resfulapi/models/todo_model.dart';
+import 'package:todo_with_resfulapi/routes/app_routes.dart';
+import 'package:todo_with_resfulapi/widgets/bottom_nav_bar_widget_home_screen.dart';
+import 'package:todo_with_resfulapi/widgets/todo_box_home_screen.dart';
 
 class MainScreenDocumentation extends StatelessWidget {
   const MainScreenDocumentation({super.key});
@@ -43,11 +45,17 @@ class MainScreenDocumentation extends StatelessWidget {
                 ),
                 itemCount: 4,
                 separatorBuilder: (_, __) => const SizedBox(height: 16),
-                itemBuilder: (context, index) => TodoBox(),
+                itemBuilder: (context, index) => TodoBox(
+                  todo: TodoModel(
+                    title: 'Sample Todo ${index + 1}',
+                    detail: 'Sample Detail ${index + 1}',
+                    isCompleted: false,
+                  ),
+                ),
               ),
             ),
           ),
-          const _BottomNavBar(),
+          const BottomNavBarWidget(),
         ],
       ),
       floatingActionButton: Padding(
@@ -73,38 +81,6 @@ class MainScreenDocumentation extends StatelessWidget {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-    );
-  }
-}
-
-class _BottomNavBar extends StatelessWidget {
-  const _BottomNavBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: (68 / 896) * MediaQuery.of(context).size.height,
-      decoration: BoxDecoration(color: AppColorsPath.white),
-      padding: const EdgeInsets.symmetric(horizontal: 91, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.list_alt, color: AppColorsPath.lavender),
-              AppText(title: 'All', style: AppTextStyle.textFontR10W400),
-            ],
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.check, color: AppColorsPath.lavender),
-              AppText(title: 'Completed', style: AppTextStyle.textFontR10W400),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }

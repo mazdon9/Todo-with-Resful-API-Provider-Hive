@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-
-import '../components/app_text.dart';
-import '../components/app_text_style.dart';
-import '../constants/app_color_path.dart';
+import 'package:todo_with_resfulapi/components/app_text.dart';
+import 'package:todo_with_resfulapi/components/app_text_style.dart';
+import 'package:todo_with_resfulapi/constants/app_color_path.dart';
+import 'package:todo_with_resfulapi/routes/app_routes.dart';
 
 class BottomNavBarWidget extends StatelessWidget {
   const BottomNavBarWidget({super.key});
@@ -16,19 +16,32 @@ class BottomNavBarWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.list_alt, color: AppColorsPath.lavender, size: 30),
-              AppText(title: 'All', style: AppTextStyle.textFontR10W400),
-            ],
+          GestureDetector(
+            onTap: () =>
+                Navigator.pushNamed(context, AppRoutes.homeScreenRouter),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.list_alt, color: AppColorsPath.lavender, size: 30),
+                AppText(title: 'All', style: AppTextStyle.textFontR10W400),
+              ],
+            ),
           ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.check, color: AppColorsPath.lavender, size: 30),
-              AppText(title: 'Completed', style: AppTextStyle.textFontR10W400),
-            ],
+          GestureDetector(
+            onTap: () => Navigator.pushNamed(
+              context,
+              AppRoutes.completedTaskScreenRouter,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.check, color: AppColorsPath.lavender, size: 30),
+                AppText(
+                  title: 'Completed',
+                  style: AppTextStyle.textFontR10W400,
+                ),
+              ],
+            ),
           ),
         ],
       ),

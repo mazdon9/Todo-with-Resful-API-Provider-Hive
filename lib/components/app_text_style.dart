@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../constants/app_color_path.dart';
+import 'package:todo_with_resfulapi/constants/app_color_path.dart';
 
 class AppTextStyle {
   static const TextStyle textFont24W600 = TextStyle(

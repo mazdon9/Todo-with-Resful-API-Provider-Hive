@@ -3,7 +3,7 @@ import 'package:todo_with_resfulapi/components/app_text.dart';
 import 'package:todo_with_resfulapi/components/app_text_style.dart';
 import 'package:todo_with_resfulapi/constants/app_color_path.dart';
 import 'package:todo_with_resfulapi/models/todo_model.dart';
-import 'package:todo_with_resfulapi/widgets/todo_box_home_screen.dart';
+import 'todo_box_home_screen.dart';
 
 class TodoListWidget extends StatelessWidget {
   final List<TodoModel> todos;

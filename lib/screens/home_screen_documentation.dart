@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../components/app_text.dart';
-import '../components/app_text_style.dart';
-import '../constants/app_color_path.dart';
-import '../constants/app_data.dart';
-import '../models/todo_model.dart';
-import '../routes/app_routes.dart';
-import '../widgets/bottom_nav_bar_widget_home_screen.dart';
-import '../widgets/todo_box_home_screen.dart';
+import 'package:todo_with_resfulapi/components/app_text.dart';
+import 'package:todo_with_resfulapi/components/app_text_style.dart';
+import 'package:todo_with_resfulapi/constants/app_color_path.dart';
+import 'package:todo_with_resfulapi/constants/app_data.dart';
+import 'package:todo_with_resfulapi/models/todo_model.dart';
+import 'package:todo_with_resfulapi/routes/app_routes.dart';
+import 'package:todo_with_resfulapi/widgets/bottom_nav_bar_widget_home_screen.dart';
+import 'package:todo_with_resfulapi/widgets/todo_box_home_screen.dart';
 
 class MainScreenDocumentation extends StatelessWidget {
   const MainScreenDocumentation({super.key});

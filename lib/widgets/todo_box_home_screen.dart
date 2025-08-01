@@ -45,6 +45,7 @@ class TodoBox extends StatelessWidget {
                     AppText(
                       title: todo.detail,
                       style: AppTextStyle.textFontR10W400.copyWith(
+                        color: AppColorsPath.black,
                         decoration: todo.isCompleted
                             ? TextDecoration.lineThrough
                             : TextDecoration.none,

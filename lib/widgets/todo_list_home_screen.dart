@@ -3,6 +3,7 @@ import 'package:todo_with_resfulapi/components/app_text.dart';
 import 'package:todo_with_resfulapi/components/app_text_style.dart';
 import 'package:todo_with_resfulapi/constants/app_color_path.dart';
 import 'package:todo_with_resfulapi/models/todo_model.dart';
+
 import 'todo_box_home_screen.dart';
 
 class TodoListWidget extends StatelessWidget {
@@ -26,7 +27,7 @@ class TodoListWidget extends StatelessWidget {
     if (todos.isEmpty) {
       return Center(
         child: AppText(
-          title: 'No tasks to perform.',
+          title: 'No things here.',
           style: AppTextStyle.textFontSM20W600.copyWith(
             color: AppColorsPath.black,
           ),

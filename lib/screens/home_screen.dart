@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_with_resfulapi/models/todo_model.dart';
-import 'package:todo_with_resfulapi/providers/todo_provider.dart';
+import 'package:todo_with_resfulapi/providers/task_provider.dart';
 import 'package:todo_with_resfulapi/routes/app_routes.dart';
 import 'package:todo_with_resfulapi/widgets/bottom_nav_bar_widget_home_screen.dart';
 import 'package:todo_with_resfulapi/widgets/todo_list_home_screen.dart';
@@ -11,8 +10,21 @@ import '../components/app_text_style.dart';
 import '../constants/app_color_path.dart';
 import '../constants/app_data.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<TaskProvider>().init();
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +54,11 @@ class HomeScreen extends StatelessWidget {
               decoration: const BoxDecoration(
                 color: AppColorsPath.lavenderLight,
               ),
-              child: Consumer<TodoProvider>(
+              child: Consumer<TaskProvider>(
                 builder: (context, todoProvider, child) {
-                  if (todoProvider.status == LoadingStatus.loading) {
+                  if (todoProvider.isLoading) {
                     return const Center(child: CircularProgressIndicator());
-                  } else if (todoProvider.status == LoadingStatus.error) {
+                  } else if (todoProvider.hasError) {
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -57,7 +69,8 @@ class HomeScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           ElevatedButton(
-                            onPressed: () => todoProvider.fetchTodos(),
+                            /// TODO: Implement Retry
+                            onPressed: () {},
                             child: const Text('Retry'),
                           ),
                         ],
@@ -65,14 +78,15 @@ class HomeScreen extends StatelessWidget {
                     );
                   } else {
                     return TodoListWidget(
-                      todos: todoProvider.todos,
-                      onTodoStatusChanged: todoProvider.toggleTodoStatus,
-                      onTodoEdit: (todo) => Navigator.pushNamed(
-                        context,
-                        AppRoutes.editTodoScreenRouter,
-                        arguments: todo,
-                      ),
-                      onTodoDelete: todoProvider.deleteTodo,
+                      tasks: todoProvider.pendingTasks,
+                      // onTodoStatusChanged: todoProvider.toggleTodoStatus,
+                      onTodoEdit:
+                          (todo) => Navigator.pushNamed(
+                            context,
+                            AppRoutes.editTodoScreenRouter,
+                            arguments: todo,
+                          ),
+                      // onTodoDelete: () {},
                     );
                   }
                 },
@@ -93,8 +107,8 @@ class HomeScreen extends StatelessWidget {
           child: SizedBox(
             width: 70,
             height: 70,
-            child: Consumer<TodoProvider>(
-              builder: (context, todoProvider, child) {
+            child: Consumer<TaskProvider>(
+              builder: (context, taskProvider, child) {
                 return FloatingActionButton(
                   backgroundColor: AppColorsPath.lavender,
                   elevation: 0,
@@ -103,9 +117,9 @@ class HomeScreen extends StatelessWidget {
                       context,
                       AppRoutes.addTodoScreeRouter,
                     );
-                    if (result != null) {
-                      todoProvider.addTodo(result as TodoModel);
-                    }
+                    // if (result != null) {
+                    //   todoProvider.addTodo(result as TodoModel);
+                    // }
                   },
                   shape: const CircleBorder(),
                   child: Icon(Icons.add, color: AppColorsPath.white, size: 36),

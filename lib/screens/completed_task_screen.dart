@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:todo_with_resfulapi/components/app_text.dart';
 import 'package:todo_with_resfulapi/components/app_text_style.dart';
 import 'package:todo_with_resfulapi/constants/app_color_path.dart';
+import 'package:todo_with_resfulapi/providers/task_provider.dart';
 import 'package:todo_with_resfulapi/providers/todo_provider.dart';
 import 'package:todo_with_resfulapi/widgets/todo_list_home_screen.dart';
 
@@ -26,11 +27,11 @@ class CompletedTaskScreen extends StatelessWidget {
       body: Container(
         width: double.infinity,
         decoration: const BoxDecoration(color: AppColorsPath.lavenderLight),
-        child: Consumer<TodoProvider>(
+        child: Consumer<TaskProvider>(
           builder: (context, todoProvider, child) {
-            if (todoProvider.status == LoadingStatus.loading) {
+            if (todoProvider.isLoading) {
               return const Center(child: CircularProgressIndicator());
-            } else if (todoProvider.status == LoadingStatus.error) {
+            } else if (todoProvider.hasError) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -41,7 +42,8 @@ class CompletedTaskScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () => todoProvider.fetchTodos(),
+                      /// TODO: Retry
+                      onPressed: () {},
                       child: const Text('Retry'),
                     ),
                   ],
@@ -49,9 +51,9 @@ class CompletedTaskScreen extends StatelessWidget {
               );
             } else {
               return TodoListWidget(
-                todos: todoProvider.completedTodos,
-                onTodoStatusChanged: todoProvider.toggleTodoStatus,
-                onTodoDelete: todoProvider.deleteTodo,
+                tasks: todoProvider.completedTasks,
+                // onTodoStatusChanged: todoProvider.toggleTodoStatus,
+                // onTodoDelete: todoProvider.deleteTodo,
               );
             }
           },

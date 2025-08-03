@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'task.dart';
+part of 'tasks.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
@@ -17,11 +17,11 @@ class TaskAdapter extends TypeAdapter<Task> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Task(
-      id: fields[0] as String?,
+      id: fields[0] as String,
       title: fields[1] as String,
       description: fields[2] as String,
       status: fields[3] as String,
-      isLocalOnly: fields[4] as bool,
+      onlyOnline: fields[4] as bool,
       needsSync: fields[5] as bool,
     );
   }
@@ -39,7 +39,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(3)
       ..write(obj.status)
       ..writeByte(4)
-      ..write(obj.isLocalOnly)
+      ..write(obj.onlyOnline)
       ..writeByte(5)
       ..write(obj.needsSync);
   }
@@ -60,11 +60,11 @@ class TaskAdapter extends TypeAdapter<Task> {
 // **************************************************************************
 
 Task _$TaskFromJson(Map<String, dynamic> json) => Task(
-      id: json['id'] as String?,
+      id: json['id'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
       status: json['status'] as String,
-      isLocalOnly: json['isLocalOnly'] as bool? ?? false,
+      onlyOnline: json['onlyOnline'] as bool? ?? false,
       needsSync: json['needsSync'] as bool? ?? false,
     );
 
@@ -73,6 +73,6 @@ Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
       'title': instance.title,
       'description': instance.description,
       'status': instance.status,
-      'isLocalOnly': instance.isLocalOnly,
+      'onlyOnline': instance.onlyOnline,
       'needsSync': instance.needsSync,
     };

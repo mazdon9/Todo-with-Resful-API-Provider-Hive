@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_with_resfulapi/models/task.dart';
-import 'package:todo_with_resfulapi/providers/task_provider.dart';
-import 'package:todo_with_resfulapi/routes/app_routes.dart';
+
+import 'models/tasks.dart';
+import 'providers/task_provider.dart';
+import 'screens/home_screen.dart';
 
 void main() async {
-  // Initialize Hive
   await Hive.initFlutter();
-
-  // Register Hive Adapter
   Hive.registerAdapter(TaskAdapter());
+  await Hive.openBox<Task>('tasks');
 
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => TaskProvider(),
-      child: const TodoRestfulApi(),
-    ),
-  );
+  runApp(const TodoRestfulApi());
 }
 
 class TodoRestfulApi extends StatelessWidget {
@@ -25,14 +19,19 @@ class TodoRestfulApi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Todo with RESTful API.',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TaskProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Todo App with RESTful API',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          useMaterial3: true,
+        ),
+        home: const HomeScreen(),
       ),
-      initialRoute: AppRoutes.homeScreenRouter,
-      routes: AppRoutes.routes,
     );
   }
 }

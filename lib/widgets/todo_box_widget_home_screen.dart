@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_with_resfulapi/components/app_text.dart';
 import 'package:todo_with_resfulapi/components/app_text_style.dart';
 import 'package:todo_with_resfulapi/constants/app_color_path.dart';
-import 'package:todo_with_resfulapi/models/task.dart';
+import 'package:todo_with_resfulapi/models/tasks.dart';
 
 class TodoBox extends StatelessWidget {
   final Task task;
@@ -35,10 +35,9 @@ class TodoBox extends StatelessWidget {
                   AppText(
                     title: task.title,
                     style: AppTextStyle.textFontSM13W600.copyWith(
-                      decoration:
-                          task.isCompleted
-                              ? TextDecoration.lineThrough
-                              : TextDecoration.none,
+                      decoration: task.isCompleted
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none,
                     ),
                   ),
                   if (task.description.isNotEmpty) ...[
@@ -46,11 +45,9 @@ class TodoBox extends StatelessWidget {
                     AppText(
                       title: task.description,
                       style: AppTextStyle.textFontR10W400.copyWith(
-                        color: AppColorsPath.black,
-                        decoration:
-                            task.isCompleted
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none,
+                        decoration: task.isCompleted
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
                       ),
                     ),
                   ],
@@ -58,11 +55,12 @@ class TodoBox extends StatelessWidget {
               ),
             ),
             IconButton(
-              icon: Icon(Icons.edit, color: AppColorsPath.lavender),
+              icon: const Icon(Icons.edit, color: AppColorsPath.lavender),
               onPressed: onEdit,
             ),
             IconButton(
-              icon: Icon(Icons.delete_outline, color: AppColorsPath.lavender),
+              icon: const Icon(Icons.delete_outline,
+                  color: AppColorsPath.lavender),
               onPressed: onDelete,
             ),
             IconButton(

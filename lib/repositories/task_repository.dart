@@ -1,10 +1,10 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:todo_with_resfulapi/models/task.dart';
+import 'package:todo_with_resfulapi/models/tasks.dart';
 import 'package:todo_with_resfulapi/services/api_service.dart';
 import 'package:todo_with_resfulapi/services/storage_service.dart';
 
 class TaskRepository {
-  final ApiService _apiServie = ApiService();
+  final ApiService _apiService = ApiService();
   final StorageService _storageService = StorageService();
   final Connectivity _connectivity = Connectivity();
 
@@ -12,31 +12,29 @@ class TaskRepository {
     await _storageService.init();
   }
 
-  /// Get All Tasks with offline-first approach
   Future<List<Task>> getAllTasks() async {
     try {
-      // Alway try to get fresh data from API if online
-      if (await _isOnline()) {
-        /// Get Data from API
-        final apiTasks = await _apiServie.getTasks();
-
-        /// Clear local storage and save fresh data
-        await _storageService.clearAllTasks();
-        await _storageService.saveAllTasks(apiTasks);
+      // Check if device is online
+      if (await isOnline()) {
+        // Fetch data from API
+        final apiTasks = await _apiService.getTasks();
+        // clear local storage and save new tasks
 
         return apiTasks;
       } else {
-        /// Get Data from Storage
-        return await _storageService.getAllTasks();
+        // fetch data from local storage
+        return _storageService.getAllTasks();
       }
+      // if the local storage is empty, fetch from API
     } catch (e) {
-      // Fallback to local storage
+      // Optionally log the error
+      print('Error fetching tasks: $e');
       return await _storageService.getAllTasks();
     }
   }
 
-  // Check if device is online
-  Future<bool> _isOnline() async {
+  // check if device is online
+  Future<bool> isOnline() async {
     try {
       final connectivityResult = await _connectivity.checkConnectivity();
       if (connectivityResult == ConnectivityResult.none) {
@@ -44,6 +42,7 @@ class TaskRepository {
       }
       return true;
     } catch (e) {
+      print('Error checking online status: $e');
       return false;
     }
   }

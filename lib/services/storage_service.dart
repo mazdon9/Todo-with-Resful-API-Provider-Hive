@@ -1,41 +1,38 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:todo_with_resfulapi/models/task.dart';
+import 'package:todo_with_resfulapi/models/tasks.dart';
 
 class StorageService {
-  static const String _taskBoxName = 'tasks';
-
-  late Box<Task> _taskBox;
-
-  // Initialize Hive boxes
+  static const String _TaskBoxName = 'tasks';
+  late Box<Task> _TaskBox;
+  // initialization of the box
   Future<void> init() async {
-    debugPrint('Initializing Storage service....');
-    _taskBox = await Hive.openBox<Task>(_taskBoxName);
-    debugPrint('Done Initialize Storage service....');
+    debugPrint('Initializing StorageService...');
+    _TaskBox = await Hive.openBox<Task>(_TaskBoxName);
+    debugPrint('StorageService initialized with box: $_TaskBoxName');
   }
 
-  // Save All Tasks
+  // save a task
   Future<void> saveAllTasks(List<Task> tasks) async {
-    debugPrint('Saving All Tasks to Storage service....');
-    final Map<String, Task> taskMap = {};
-
+    debugPrint('Saving ${tasks.length} tasks to storage...');
+    final Map<String, Task> TaskMap = {};
     for (final task in tasks) {
       final key = task.id ?? DateTime.now().millisecondsSinceEpoch.toString();
-      taskMap[key] = task.copyWith(id: key);
+      TaskMap[key] = task.copyWith(id: key);
     }
-
-    await _taskBox.putAll(taskMap);
-    debugPrint('All Tasks Saved to Storage service....');
+    await _TaskBox.putAll(TaskMap);
+    debugPrint('All tasks saved successfully.');
   }
 
-  // Get All Tasks
+  // get all tasks
   Future<List<Task>> getAllTasks() async {
-    final task = _taskBox.values.toList();
-    return task;
+    final tasks = _TaskBox.values.toList();
+    return tasks;
   }
 
-  // Clear All Tasks in local
+  //clear all tasks
   Future<void> clearAllTasks() async {
-    await _taskBox.clear();
+    await _TaskBox.clear();
+    debugPrint('All tasks cleared from storage.');
   }
 }

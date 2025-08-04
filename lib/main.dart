@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_with_resfulapi/providers/todo_provider.dart';
+import 'package:todo_with_resfulapi/providers/task_provider.dart';
 import 'package:todo_with_resfulapi/routes/app_routes.dart';
 
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => TodoProvider(),
+      create: (context) => TaskProvider(),
       child: const TodoRestfulApi(),
     ),
   );

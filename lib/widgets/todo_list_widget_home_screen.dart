@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:todo_with_resfulapi/components/app_text.dart';
 import 'package:todo_with_resfulapi/components/app_text_style.dart';
 import 'package:todo_with_resfulapi/constants/app_color_path.dart';
-import 'package:todo_with_resfulapi/models/task.dart';
-
-import 'todo_box_home_screen.dart';
+import 'package:todo_with_resfulapi/models/tasks.dart';
+import 'package:todo_with_resfulapi/widgets/todo_box_widget_home_screen.dart';
 
 class TodoListWidget extends StatelessWidget {
   final List<Task> tasks;

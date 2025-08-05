@@ -1,23 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:provider/provider.dart';
-import 'package:todo_with_resfulapi/models/task.dart';
-import 'package:todo_with_resfulapi/providers/task_provider.dart';
 import 'package:todo_with_resfulapi/routes/app_routes.dart';
 
 void main() async {
-  // Initialize Hive
-  await Hive.initFlutter();
-
   // Register Hive Adapter
-  Hive.registerAdapter(TaskAdapter());
-
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => TaskProvider(),
-      child: const TodoRestfulApi(),
-    ),
-  );
+  runApp(TodoRestfulApi());
 }
 
 class TodoRestfulApi extends StatelessWidget {

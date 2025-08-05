@@ -1,6 +1,3 @@
-import 'package:todo_with_resfulapi/screens/add_todo_screen.dart';
-import 'package:todo_with_resfulapi/screens/completed_task_screen.dart';
-import 'package:todo_with_resfulapi/screens/edit_todo_screen.dart';
 import 'package:todo_with_resfulapi/screens/home_screen.dart';
 
 class AppRoutes {
@@ -11,8 +8,8 @@ class AppRoutes {
 
   static final routes = {
     homeScreenRouter: (context) => const HomeScreen(),
-    addTodoScreeRouter: (context) => const AddTodoScreen(),
-    editTodoScreenRouter: (context) => const EditTodoScreen(),
-    completedTaskScreenRouter: (context) => const CompletedTaskScreen(),
+    // addTodoScreeRouter: (context) => const AddTodoScreen(),
+    // editTodoScreenRouter: (context) => const EditTodoScreen(),
+    // completedTaskScreenRouter: (context) => const CompletedTaskScreen(),
   };
 }

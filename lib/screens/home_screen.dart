@@ -53,26 +53,49 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               children: [
                 // loading indicator
-                // if (taskProvider.isLoading)
-                Expanded(
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: AppColorsPath.black,
+                if (taskProvider.isLoading)
+                  Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: AppColorsPath.black,
+                      ),
                     ),
                   ),
-                ),
                 // error message
-                // if (taskProvider.hasError)
-                //   Center(
-                //     child: AppText(
-                //       title: 'Error: ${taskProvider.errorMessage}',
-                //       style: AppTextStyle.textFontR10W400.copyWith(
-                //         color: AppColorsPath.black,
-                //       ),
-                //     ),
-                //   ),
-
-                //
+                if (taskProvider.hasError)
+                  Center(
+                    child: AppText(
+                      title: 'Error: ${taskProvider.errorMessage}',
+                      style: AppTextStyle.textFontR10W400.copyWith(
+                        color: AppColorsPath.black,
+                      ),
+                    ),
+                  ),
+                // empty state
+                if (!taskProvider.isLoading &&
+                    taskProvider.pendingTasks.isEmpty)
+                  Center(
+                    child: AppText(
+                      title: 'No tasks available',
+                      style: AppTextStyle.textFontR10W400.copyWith(
+                        color: AppColorsPath.black,
+                      ),
+                    ),
+                  ),
+                // success state
+                if (taskProvider.tasks.isNotEmpty && !taskProvider.isLoading)
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: taskProvider.tasks.length,
+                      separatorBuilder:
+                          (context, index) => SizedBox(
+                            height: 21,
+                          ), // Set a fixed height for each item
+                      itemBuilder: (context, index) {
+                        return _BuildTaskItemWidget();
+                      },
+                    ),
+                  ),
               ],
             ),
           ),

@@ -4,9 +4,9 @@ import 'package:todo_with_resfulapi/reponsitories/task_repository.dart';
 
 class TaskProvider with ChangeNotifier {
   final TaskRepository _taskRepository = TaskRepository();
-  late List<Task> _tasks;
+  List<Task> _tasks = [];
   List<Task> get tasks => _tasks;
-  List<Task> get completedTasks =>
+  List<Task> get pendingTasks =>
       _tasks.where((task) => task.isPending).toList();
   final bool _isLoading = false;
   bool get isLoading => _isLoading;

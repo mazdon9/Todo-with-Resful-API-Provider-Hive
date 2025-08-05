@@ -1,5 +1,5 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'task.g.dart';
 
@@ -34,8 +34,8 @@ class Task {
     );
   }
 
-  bool get isCompleted => status == 'completed';
-  bool get isPending => status == 'pending';
+  bool get isCompleted => status == 'completada';
+  bool get isPending => status == 'pendiente';
 
   //convert form API json to Task object
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);

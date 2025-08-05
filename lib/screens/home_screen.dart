@@ -28,6 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Consumer<TaskProvider>(
       builder: (context, taskProvider, child) {
+        // Debug prints
+        print('isLoading: ${taskProvider.isLoading}');
+        print('hasError: ${taskProvider.hasError}');
+        print('tasks length: ${taskProvider.tasks.length}');
         return Scaffold(
           backgroundColor: AppColorsPath.lavenderLight,
           appBar: AppBar(

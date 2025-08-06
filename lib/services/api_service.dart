@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:todo_with_resfulapi/models/task.dart';
 
 class ApiService {
   static const String _baseUrl = 'https://task-manager-api3.p.rapidapi.com/';
   static const String _apiKey =
-      '73f36bbf3emsh0485c276574c141p16ec83jsne2d270cfbfc0';
+      '67bf9311ccmsh5c0f38290745835p18ab45jsnaaed529f2a0d';
   static const String _apiHost = 'task-manager-api3.p.rapidapi.com';
 
   static const _header = {
@@ -42,8 +42,17 @@ class ApiService {
           debugPrint('API wrong format');
           throw Exception('Failed to fetch tasks');
         }
+      } else if (response.statusCode == 403) {
+        debugPrint('API Key unauthorized or expired');
+        throw Exception(
+          'API Key unauthorized. Please check your RapidAPI subscription.',
+        );
+      } else if (response.statusCode == 429) {
+        debugPrint('API rate limit exceeded');
+        throw Exception('API rate limit exceeded. Please try again later.');
       } else {
-        throw Exception('Failed to fetch tasks');
+        debugPrint('API error: ${response.statusCode} - ${response.body}');
+        throw Exception('Failed to fetch tasks: ${response.statusCode}');
       }
     } catch (e) {
       debugPrint('Error fetching tasks: $e');

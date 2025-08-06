@@ -106,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
           floatingActionButton: Padding(
-            padding: const EdgeInsets.only(bottom: 63, right: 22),
+            padding: const EdgeInsets.only(bottom: 80, right: 22),
             child: PhysicalModel(
               color: AppColorsPath.lavender,
               elevation: 6,
@@ -120,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   elevation: 0,
                   onPressed: () async {},
                   shape: const CircleBorder(),
-                  child: Icon(Icons.add, color: AppColorsPath.white, size: 36),
+                  child: Icon(Icons.add, color: AppColorsPath.white, size: 40),
                 ),
               ),
             ),

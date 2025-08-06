@@ -52,7 +52,7 @@ class CompletedTasksScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCompletedTaskItem(BuildContext context, Task task) {
+  Container _buildCompletedTaskItem(BuildContext context, Task task) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),

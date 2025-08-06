@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_with_resfulapi/models/task.dart';
 import 'package:todo_with_resfulapi/providers/task_provider.dart';
 import 'package:todo_with_resfulapi/routes/app_routes.dart';
 
-void main() {
+void main() async {
+  // Initilize Hive
+  await Hive.initFlutter();
+
+  // Register Hive adapter for Task model
+  Hive.registerAdapter(TaskAdapter());
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => TaskProvider(),

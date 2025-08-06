@@ -61,12 +61,12 @@ class ApiService {
   }
 
   /// POST - Create new task
-  Future<Task> createTask(String title, String description) async {
+  Future<void> createTask(String title, String description) async {
     try {
       final body = json.encode({
         'title': title,
         'description': description,
-        'isPending': true,
+        "status": "pendiente",
       });
 
       final response = await http.post(
@@ -83,7 +83,7 @@ class ApiService {
 
         if (jsonResponse['status'] == 'success' &&
             jsonResponse['data'] != null) {
-          return Task.fromJson(jsonResponse['data'] as Map<String, dynamic>);
+          debugPrint("Create task success");
         } else {
           throw Exception('Failed to create task - Invalid response format');
         }
@@ -104,7 +104,7 @@ class ApiService {
   }
 
   /// PUT - Update existing task
-  Future<Task> updateTask(Task task) async {
+  Future<void> updateTask(Task task) async {
     try {
       final body = json.encode(task.toJson());
 
@@ -118,14 +118,7 @@ class ApiService {
       debugPrint('Update task response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonResponse = json.decode(response.body);
-
-        if (jsonResponse['status'] == 'success' &&
-            jsonResponse['data'] != null) {
-          return Task.fromJson(jsonResponse['data'] as Map<String, dynamic>);
-        } else {
-          throw Exception('Failed to update task - Invalid response format');
-        }
+        debugPrint('Task updated successfully');
       } else if (response.statusCode == 403) {
         throw Exception('API Key unauthorized or expired');
       } else if (response.statusCode == 429) {

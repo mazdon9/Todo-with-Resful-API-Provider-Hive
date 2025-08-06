@@ -6,6 +6,7 @@ import 'package:todo_with_resfulapi/constants/app_color_path.dart';
 import 'package:todo_with_resfulapi/constants/app_data.dart';
 import 'package:todo_with_resfulapi/models/task.dart';
 import 'package:todo_with_resfulapi/providers/task_provider.dart';
+import 'package:todo_with_resfulapi/routes/app_routes.dart';
 import 'package:todo_with_resfulapi/widgets/bottom_nav_bar_widget_home_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -20,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     /// Get data
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TaskProvider>().loadTasks();
+      context.read<TaskProvider>().init();
     });
     super.initState();
   }
@@ -58,10 +59,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (taskProvider.isLoading)
                   Expanded(
                     child: const Center(child: CircularProgressIndicator()),
-                  ),
-
+                  )
                 /// Case 2: No data
-                if (!taskProvider.isLoading && taskProvider.hasError)
+                else if (taskProvider.hasError)
                   Expanded(
                     child: Center(
                       child: AppText(
@@ -71,11 +71,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                  ),
-
+                  )
                 /// Case 3: Empty Data
-                if (!taskProvider.isLoading &&
-                    taskProvider.pendingTasks.isEmpty)
+                else if (taskProvider.pendingTasks.isEmpty)
                   Expanded(
                     child: Center(
                       child: AppText(
@@ -85,11 +83,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                  ),
-
+                  )
                 /// Case 4: Has Data
-                if (!taskProvider.isLoading &&
-                    taskProvider.pendingTasks.isNotEmpty)
+                else if (taskProvider.pendingTasks.isNotEmpty)
                   Expanded(
                     child: ListView.separated(
                       itemCount: taskProvider.pendingTasks.length,
@@ -111,14 +107,15 @@ class _HomeScreenState extends State<HomeScreen> {
               color: AppColorsPath.lavender,
               elevation: 6,
               shape: BoxShape.circle,
-
               child: SizedBox(
                 width: 70,
                 height: 70,
                 child: FloatingActionButton(
                   backgroundColor: AppColorsPath.lavender,
                   elevation: 0,
-                  onPressed: () async {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.addTodoScreeRouter);
+                  },
                   shape: const CircleBorder(),
                   child: Icon(Icons.add, color: AppColorsPath.white, size: 40),
                 ),
@@ -161,13 +158,32 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           /// TODO: Implemement Edit Flow later
-          IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                AppRoutes.editTodoScreenRouter,
+                arguments: task,
+              );
+            },
+            icon: Icon(Icons.edit),
+          ),
 
-          /// TODO: Implemement Delete Flow later
-          IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
+          IconButton(
+            onPressed: () {
+              /// TODO: show confirm deletion dialog before handling delete task
+              context.read<TaskProvider>().deleteTask(task.id ?? '');
+            },
+            icon: Icon(Icons.delete),
+          ),
 
-          /// TODO: Implemement Completed Flow later
-          IconButton(onPressed: () {}, icon: Icon(Icons.check_circle_outlined)),
+          IconButton(
+            onPressed: () {
+              /// TODO: show confirm completion dialog before handling task completion logic
+              context.read<TaskProvider>().toggleTaskCompletion(task);
+            },
+            icon: Icon(Icons.check_circle_outlined),
+          ),
         ],
       ),
     );

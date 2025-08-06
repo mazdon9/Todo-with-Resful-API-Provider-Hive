@@ -1,33 +1,50 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_with_resfulapi/models/task.dart';
 import 'package:todo_with_resfulapi/services/api_service.dart';
+import 'package:todo_with_resfulapi/services/storage_service.dart';
 
 class TaskRepository {
   final ApiService _apiService = ApiService();
+  final StorageService _storageService = StorageService();
+  final Connectivity _connectivity = Connectivity();
 
-  /// Get all tasks from the API
+  /// Init StorageService
+  Future<void> init() async {
+    await _storageService.init();
+  }
+
+  /// Get all tasks from the API or local hive
   Future<List<Task>> getAllTasks() async {
     try {
-      return await _apiService.getAllTasks();
+      if (await _isOnline()) {
+        /// Get tasks from api and later save to local
+        final tasks = await _apiService.getAllTasks();
+        await _storageService.saveAllTasks(tasks);
+        return tasks;
+      } else {
+        /// Get tasks from local hive
+        return await _storageService.getAllTasks();
+      }
     } catch (e) {
       debugPrint('Error fetching tasks in TaskRepository: $e');
-      throw Exception('Failed to fetch tasks TaskRepository $e');
+      return await _storageService.getAllTasks();
     }
   }
 
   /// Create new task
-  Future<Task> createTask(String title, String description) async {
+  Future<void> createTask(String title, String description) async {
     try {
-      return await _apiService.createTask(title, description);
+      await _apiService.createTask(title, description);
     } catch (e) {
       throw Exception('Repository: Failed to create task - $e');
     }
   }
 
   /// Update existing task
-  Future<Task> updateTask(Task task) async {
+  Future<void> updateTask(Task task) async {
     try {
-      return await _apiService.updateTask(task);
+      await _apiService.updateTask(task);
     } catch (e) {
       throw Exception('Repository: Failed to update task - $e');
     }
@@ -43,7 +60,7 @@ class TaskRepository {
   }
 
   /// Toggle task completion status
-  Future<Task> toggleTaskCompletion(Task task) async {
+  Future<void> toggleTaskCompletion(Task task) async {
     try {
       final updatedTask = Task(
         id: task.id,
@@ -54,9 +71,19 @@ class TaskRepository {
                 ? 'completada'
                 : 'pendiente', // Toggle từ pendiente sang completada và ngược lại
       );
-      return await _apiService.updateTask(updatedTask);
+      await _apiService.updateTask(updatedTask);
     } catch (e) {
       throw Exception('Repository: Failed to toggle task completion - $e');
+    }
+  }
+
+  Future<bool> _isOnline() async {
+    try {
+      final connectivityResult = await _connectivity.checkConnectivity();
+      return connectivityResult != ConnectivityResult.none;
+    } catch (e) {
+      debugPrint('Repository: Failed to check internet connection - $e');
+      return false;
     }
   }
 }

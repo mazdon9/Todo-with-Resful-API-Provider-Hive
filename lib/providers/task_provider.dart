@@ -23,12 +23,27 @@ class TaskProvider with ChangeNotifier {
 
   bool get hasError => _error != null;
 
+  Future<void> init() async {
+    try {
+      _setLoading(true);
+      _clearError();
+      await _taskRepository.init();
+      await loadTasks();
+    } catch (e) {
+      _setError('Failed to init $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   /// Get All Tasks From Repository
   Future<void> loadTasks() async {
     try {
       _setLoading(true);
       _clearError();
       _tasks = await _taskRepository.getAllTasks();
+
+      notifyListeners();
 
       /// Log
       debugPrint('Tasks Loaded Successfully');
@@ -47,90 +62,91 @@ class TaskProvider with ChangeNotifier {
   }
 
   /// Create new task
-  Future<bool> createTask(String title, String description) async {
+  Future<void> createTask(String title, String description) async {
     try {
       _setLoading(true);
       _clearError();
-      
-      final newTask = await _taskRepository.createTask(title, description);
-      _tasks.add(newTask);
-      
-      debugPrint('Task created successfully: ${newTask.title}');
+
+      await _taskRepository.createTask(title, description);
+      _tasks = await _taskRepository.getAllTasks();
+
+      debugPrint('Task created successfully: ${pendingTasks.length}');
       notifyListeners();
-      return true;
     } catch (e) {
       _setError('Failed to create task. $e');
-      return false;
     } finally {
       _setLoading(false);
     }
   }
 
   /// Update existing task
-  Future<bool> updateTask(Task task) async {
+  Future<void> updateTask(Task task) async {
     try {
-      _setLoading(true);
       _clearError();
-      
-      final updatedTask = await _taskRepository.updateTask(task);
+      _setLoading(true);
+
+      await _taskRepository.updateTask(task);
       final index = _tasks.indexWhere((t) => t.id == task.id);
-      
+
       if (index != -1) {
-        _tasks[index] = updatedTask;
+        _tasks[index] = _tasks[index].copyWith(
+          title: task.title,
+          description: task.description,
+        );
+        final updatedTask = _tasks[index];
         debugPrint('Task updated successfully: ${updatedTask.title}');
         notifyListeners();
-        return true;
       } else {
         throw Exception('Task not found in local list');
       }
     } catch (e) {
       _setError('Failed to update task. $e');
-      return false;
     } finally {
       _setLoading(false);
     }
   }
 
   /// Delete task
-  Future<bool> deleteTask(String taskId) async {
+  Future<void> deleteTask(String taskId) async {
     try {
-      _setLoading(true);
       _clearError();
-      
+      _setLoading(true);
+
       await _taskRepository.deleteTask(taskId);
       _tasks.removeWhere((task) => task.id == taskId);
-      
+
       debugPrint('Task deleted successfully: $taskId');
       notifyListeners();
-      return true;
     } catch (e) {
       _setError('Failed to delete task. $e');
-      return false;
     } finally {
       _setLoading(false);
     }
   }
 
   /// Toggle task completion status
-  Future<bool> toggleTaskCompletion(Task task) async {
+  Future<void> toggleTaskCompletion(Task task) async {
     try {
-      _setLoading(true);
       _clearError();
-      
-      final updatedTask = await _taskRepository.toggleTaskCompletion(task);
+      _setLoading(true);
+
+      await _taskRepository.toggleTaskCompletion(task);
       final index = _tasks.indexWhere((t) => t.id == task.id);
-      
+
       if (index != -1) {
-        _tasks[index] = updatedTask;
-        debugPrint('Task completion toggled: ${updatedTask.title} - status: ${updatedTask.status}');
+        _tasks[index] = _tasks[index].copyWith(
+          status: _tasks[index].isPending ? 'completada' : 'pendiente',
+        );
+        final updatedTask = _tasks[index];
+        debugPrint(
+          'Task completion toggled: ${updatedTask.title} - status: ${updatedTask.status}',
+        );
         notifyListeners();
-        return true;
       } else {
-        throw Exception('Task not found in local list');
+        _setError('Task not found in local list');
       }
     } catch (e) {
       _setError('Failed to toggle task completion. $e');
-      return false;
     } finally {
       _setLoading(false);
     }

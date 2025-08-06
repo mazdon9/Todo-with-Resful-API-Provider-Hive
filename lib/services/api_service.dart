@@ -7,7 +7,7 @@ import 'package:todo_with_resfulapi/models/task.dart';
 class ApiService {
   static const String _baseUrl = 'https://task-manager-api3.p.rapidapi.com/';
   static const String _apiKey =
-      '67bf9311ccmsh5c0f38290745835p18ab45jsnaaed529f2a0d';
+      '73f36bbf3emsh0485c276574c141p16ec83jsne2d270cfbfc0';
   static const String _apiHost = 'task-manager-api3.p.rapidapi.com';
 
   static const _header = {
@@ -57,6 +57,120 @@ class ApiService {
     } catch (e) {
       debugPrint('Error fetching tasks: $e');
       throw Exception('Failed to fetch tasks $e');
+    }
+  }
+
+  /// POST - Create new task
+  Future<Task> createTask(String title, String description) async {
+    try {
+      final body = json.encode({
+        'title': title,
+        'description': description,
+        'isPending': true,
+      });
+
+      final response = await http.post(
+        Uri.parse(_baseUrl),
+        headers: _header,
+        body: body,
+      );
+
+      debugPrint('Create task response status: ${response.statusCode}');
+      debugPrint('Create task response body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+
+        if (jsonResponse['status'] == 'success' &&
+            jsonResponse['data'] != null) {
+          return Task.fromJson(jsonResponse['data'] as Map<String, dynamic>);
+        } else {
+          throw Exception('Failed to create task - Invalid response format');
+        }
+      } else if (response.statusCode == 403) {
+        throw Exception('API Key unauthorized or expired');
+      } else if (response.statusCode == 429) {
+        throw Exception('API rate limit exceeded. Please try again later.');
+      } else {
+        debugPrint(
+          'Create task error: ${response.statusCode} - ${response.body}',
+        );
+        throw Exception('Failed to create task: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error creating task: $e');
+      throw Exception('Failed to create task: $e');
+    }
+  }
+
+  /// PUT - Update existing task
+  Future<Task> updateTask(Task task) async {
+    try {
+      final body = json.encode(task.toJson());
+
+      final response = await http.put(
+        Uri.parse('$_baseUrl${task.id}'),
+        headers: _header,
+        body: body,
+      );
+
+      debugPrint('Update task response status: ${response.statusCode}');
+      debugPrint('Update task response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+
+        if (jsonResponse['status'] == 'success' &&
+            jsonResponse['data'] != null) {
+          return Task.fromJson(jsonResponse['data'] as Map<String, dynamic>);
+        } else {
+          throw Exception('Failed to update task - Invalid response format');
+        }
+      } else if (response.statusCode == 403) {
+        throw Exception('API Key unauthorized or expired');
+      } else if (response.statusCode == 429) {
+        throw Exception('API rate limit exceeded. Please try again later.');
+      } else {
+        debugPrint(
+          'Update task error: ${response.statusCode} - ${response.body}',
+        );
+        throw Exception('Failed to update task: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error updating task: $e');
+      throw Exception('Failed to update task: $e');
+    }
+  }
+
+  /// DELETE - Delete task
+  Future<void> deleteTask(String taskId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$_baseUrl$taskId'),
+        headers: _header,
+      );
+
+      debugPrint('Delete task response status: ${response.statusCode}');
+      debugPrint('Delete task response body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // Deletion successful
+        debugPrint('Task deleted successfully');
+      } else if (response.statusCode == 403) {
+        throw Exception('API Key unauthorized or expired');
+      } else if (response.statusCode == 404) {
+        throw Exception('Task not found');
+      } else if (response.statusCode == 429) {
+        throw Exception('API rate limit exceeded. Please try again later.');
+      } else {
+        debugPrint(
+          'Delete task error: ${response.statusCode} - ${response.body}',
+        );
+        throw Exception('Failed to delete task: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error deleting task: $e');
+      throw Exception('Failed to delete task: $e');
     }
   }
 }

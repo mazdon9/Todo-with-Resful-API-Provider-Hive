@@ -29,9 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Consumer<TaskProvider>(
       builder: (context, taskProvider, child) {
         // Debug prints
-        print('isLoading: ${taskProvider.isLoading}');
-        print('hasError: ${taskProvider.hasError}');
-        print('tasks length: ${taskProvider.tasks.length}');
+        debugPrint('isLoading: ${taskProvider.isLoading}');
+        debugPrint('hasError: ${taskProvider.hasError}');
+        debugPrint('tasks length: ${taskProvider.tasks.length}');
         return Scaffold(
           backgroundColor: AppColorsPath.lavenderLight,
           appBar: AppBar(

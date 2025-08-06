@@ -17,8 +17,8 @@ class BottomNavBarWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
-            onTap: () =>
-                Navigator.pushNamed(context, AppRoutes.homeScreenRouter),
+            onTap:
+                () => Navigator.pushNamed(context, AppRoutes.homeScreenRouter),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -28,10 +28,11 @@ class BottomNavBarWidget extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => Navigator.pushNamed(
-              context,
-              AppRoutes.completedTaskScreenRouter,
-            ),
+            onTap:
+                () => Navigator.pushNamed(
+                  context,
+                  AppRoutes.completedTaskScreenRouter,
+                ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [

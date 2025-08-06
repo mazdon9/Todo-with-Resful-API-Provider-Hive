@@ -10,8 +10,8 @@ class TaskRepository {
     try {
       return await _apiService.getAllTasks();
     } catch (e) {
-      debugPrint('Error fetching tasks in Repository: $e');
-      throw Exception('Failed to fetch tasks Repository $e');
+      debugPrint('Error fetching tasks in ReTaskRepositoryposi: $e');
+      throw Exception('Failed to fetch tasks TaskRepository $e');
     }
   }
 }

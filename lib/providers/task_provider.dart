@@ -1,46 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:todo_with_resfulapi/models/task.dart';
-import 'package:todo_with_resfulapi/reponsitories/task_repository.dart';
+import 'package:todo_with_resfulapi/repositories/task_repository.dart';
 
 class TaskProvider with ChangeNotifier {
   final TaskRepository _taskRepository = TaskRepository();
+
   List<Task> _tasks = [];
+
   List<Task> get tasks => _tasks;
+
   List<Task> get pendingTasks =>
       _tasks.where((task) => task.isPending).toList();
-  final bool _isLoading = false;
+
+  bool _isLoading = false;
   bool get isLoading => _isLoading;
-  String? _errorMessage;
-  String? get errorMessage => _errorMessage;
 
-  bool get hasError => _errorMessage != null;
+  String? _error;
+  String? get error => _error;
 
-  // get all tasks form repository
-  Future<void> LoadTasks() async {
+  bool get hasError => _error != null;
+
+  /// Get All Tasks From Repository
+  Future<void> loadTasks() async {
     try {
       _setLoading(true);
       _tasks = await _taskRepository.getAllTasks();
-      debugPrint('Tasks loaded: ${_tasks.length}');
+
+      /// Log
+      debugPrint('Tasks Loaded Successfully');
+      debugPrint('Tasks Loaded with length: ${_tasks.length}');
       debugPrint(
-        'tasks: pending: ${_tasks.where((task) => task.isPending).length}',
+        'Tasks Loaded pendingTasks with length: ${pendingTasks.length}',
       );
     } catch (e) {
-      _setError('Failed to load tasks: $e');
+      _setError('Failed to load tasks. Please try again later. $e');
     } finally {
       _setLoading(false);
     }
   }
 
-  // setloading state
   void _setLoading(bool loading) {
-    if (loading != _isLoading) {
-      notifyListeners();
-    }
+    _isLoading = loading;
+    notifyListeners();
   }
 
-  // set error message
   void _setError(String error) {
-    _errorMessage = error;
+    _error = error;
     notifyListeners();
   }
 }

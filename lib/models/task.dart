@@ -1,4 +1,4 @@
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'task.g.dart';
@@ -7,19 +7,24 @@ part 'task.g.dart';
 @JsonSerializable()
 class Task {
   @HiveField(0)
-  final String id;
+  final String? id;
+
   @HiveField(1)
   final String title;
+
   @HiveField(2)
   final String description;
+
   @HiveField(3)
   final String status;
+
   Task({
-    required this.id,
+    this.id,
     required this.title,
     required this.description,
     required this.status,
   });
+
   Task copyWith({
     String? id,
     String? title,
@@ -37,8 +42,9 @@ class Task {
   bool get isCompleted => status == 'completada';
   bool get isPending => status == 'pendiente';
 
-  //convert form API json to Task object
+  // Convert from API JSON
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
-  //convert Task object to API json
+
+  // Convert to API JSON
   Map<String, dynamic> toJson() => _$TaskToJson(this);
 }

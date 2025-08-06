@@ -4,7 +4,8 @@ import 'package:todo_with_resfulapi/components/app_text.dart';
 import 'package:todo_with_resfulapi/components/app_text_style.dart';
 import 'package:todo_with_resfulapi/constants/app_color_path.dart';
 import 'package:todo_with_resfulapi/constants/app_data.dart';
-import 'package:todo_with_resfulapi/provider/task_provider.dart';
+import 'package:todo_with_resfulapi/models/task.dart';
+import 'package:todo_with_resfulapi/providers/task_provider.dart';
 import 'package:todo_with_resfulapi/widgets/bottom_nav_bar_widget_home_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,21 +18,17 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
-    super.initState();
-    // Load tasks when the screen is initialized
+    /// Get data
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<TaskProvider>(context, listen: false).LoadTasks();
+      context.read<TaskProvider>().loadTasks();
     });
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<TaskProvider>(
-      builder: (context, taskProvider, child) {
-        // Debug prints
-        debugPrint('isLoading: ${taskProvider.isLoading}');
-        debugPrint('hasError: ${taskProvider.hasError}');
-        debugPrint('tasks length: ${taskProvider.tasks.length}');
+      builder: (_, taskProvider, __) {
         return Scaffold(
           backgroundColor: AppColorsPath.lavenderLight,
           appBar: AppBar(
@@ -53,54 +50,79 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           bottomNavigationBar: BottomNavBarWidget(),
           body: Padding(
-            padding: const EdgeInsets.only(top: 22, left: 7, right: 7),
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                // loading indicator
+                /// Body
+                /// Case 1: Loading
                 if (taskProvider.isLoading)
                   Expanded(
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+
+                /// Case 2: No data
+                if (!taskProvider.isLoading && taskProvider.hasError)
+                  Expanded(
                     child: Center(
-                      child: CircularProgressIndicator(
-                        color: AppColorsPath.black,
+                      child: AppText(
+                        title: 'Error loading tasks ${taskProvider.error}',
+                        style: AppTextStyle.textFont24W600.copyWith(
+                          color: Colors.red,
+                        ),
                       ),
                     ),
                   ),
-                // error message
-                if (taskProvider.hasError)
-                  Center(
-                    child: AppText(
-                      title: 'Error: ${taskProvider.errorMessage}',
-                      style: AppTextStyle.textFontR10W400.copyWith(
-                        color: AppColorsPath.black,
-                      ),
-                    ),
-                  ),
-                // empty state
+
+                /// Case 3: Empty Data
                 if (!taskProvider.isLoading &&
                     taskProvider.pendingTasks.isEmpty)
-                  Center(
-                    child: AppText(
-                      title: 'No tasks available',
-                      style: AppTextStyle.textFontR10W400.copyWith(
-                        color: AppColorsPath.black,
+                  Expanded(
+                    child: Center(
+                      child: AppText(
+                        title: 'There is no pending tasks, please add new task',
+                        style: AppTextStyle.textFont24W600.copyWith(
+                          color: Colors.red,
+                        ),
                       ),
                     ),
                   ),
-                // success state
-                if (taskProvider.tasks.isNotEmpty && !taskProvider.isLoading)
+
+                /// Case 4: Has Data
+                if (!taskProvider.isLoading &&
+                    taskProvider.pendingTasks.isNotEmpty)
                   Expanded(
                     child: ListView.separated(
-                      itemCount: taskProvider.tasks.length,
+                      itemCount: taskProvider.pendingTasks.length,
                       separatorBuilder:
-                          (context, index) => SizedBox(
-                            height: 21,
-                          ), // Set a fixed height for each item
+                          (context, index) => SizedBox(height: 21),
                       itemBuilder: (context, index) {
-                        return _BuildTaskItemWidget();
+                        final task = taskProvider.pendingTasks[index];
+                        return _buildTaskItemWidget(task: task);
                       },
                     ),
                   ),
               ],
+            ),
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.only(bottom: 80, right: 22),
+            child: PhysicalModel(
+              color: AppColorsPath.lavender,
+              elevation: 6,
+              shape: BoxShape.circle,
+
+              child: SizedBox(
+                width: 70,
+                height: 70,
+                child: FloatingActionButton(
+                  backgroundColor: AppColorsPath.lavender,
+                  elevation: 0,
+                  onPressed: () async {},
+                  shape: const CircleBorder(),
+                  child: Icon(Icons.add, color: AppColorsPath.white, size: 36),
+                ),
+              ),
             ),
           ),
         );
@@ -108,10 +130,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Container _BuildTaskItemWidget() {
+  Container _buildTaskItemWidget({required Task task}) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(15),
         color: AppColorsPath.white,
       ),
       padding: EdgeInsets.all(12),
@@ -123,13 +145,13 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AppText(
-                  title: "TODO TITLE",
+                  title: task.title,
                   style: AppTextStyle.textFontSM13W600.copyWith(
                     color: AppColorsPath.lavender,
                   ),
                 ),
                 AppText(
-                  title: "TODO SUB TITLE",
+                  title: task.description,
                   style: AppTextStyle.textFontR10W400.copyWith(
                     color: AppColorsPath.black,
                   ),
@@ -137,9 +159,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+
+          /// TODO: Implemement Edit Flow later
           IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
+
+          /// TODO: Implemement Delete Flow later
           IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
-          IconButton(onPressed: () {}, icon: Icon(Icons.check_circle)),
+
+          /// TODO: Implemement Completed Flow later
+          IconButton(onPressed: () {}, icon: Icon(Icons.check_circle_outlined)),
         ],
       ),
     );

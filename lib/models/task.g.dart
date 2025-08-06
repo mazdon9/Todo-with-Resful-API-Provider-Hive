@@ -17,7 +17,7 @@ class TaskAdapter extends TypeAdapter<Task> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Task(
-      id: fields[0] as String,
+      id: fields[0] as String?,
       title: fields[1] as String,
       description: fields[2] as String,
       status: fields[3] as String,
@@ -54,7 +54,7 @@ class TaskAdapter extends TypeAdapter<Task> {
 // **************************************************************************
 
 Task _$TaskFromJson(Map<String, dynamic> json) => Task(
-      id: json['id'] as String,
+      id: json['id'] as String?,
       title: json['title'] as String,
       description: json['description'] as String,
       status: json['status'] as String,

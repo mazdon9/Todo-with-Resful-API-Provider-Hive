@@ -175,12 +175,7 @@ class TaskProvider extends ChangeNotifier {
 
       await _checkConnectivity();
 
-      if (_isOnline) {
-        // Nếu online, sync pending operations trước
-        await syncPendingOperations();
-      }
-
-      // Sau đó load lại all tasks
+      // Chỉ load lại tasks, KHÔNG auto sync
       await getAllTasks();
 
       debugPrint('Tasks refreshed successfully');
@@ -191,7 +186,7 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  /// Sync pending operations
+  /// Sync pending operations (manual user action)
   Future<void> syncPendingOperations() async {
     try {
       if (!_isOnline) {
@@ -199,22 +194,53 @@ class TaskProvider extends ChangeNotifier {
         return;
       }
 
+      debugPrint('=== SYNC STARTED ===');
+      debugPrint('Before sync - Pending count: $_pendingSyncCount');
+
       _isSyncing = true;
       notifyListeners();
 
       await _taskRepository.syncPendingOperations();
+
+      debugPrint('Repository sync completed, updating pending count...');
       await _updatePendingSyncCount();
+      debugPrint('After sync - New pending count: $_pendingSyncCount');
 
       // Reload tasks after sync
       await getAllTasks();
 
-      debugPrint('Sync completed successfully');
+      debugPrint('=== SYNC COMPLETED ===');
+      debugPrint('Final pending count: $_pendingSyncCount');
     } catch (e) {
       debugPrint('Provider: Error syncing pending operations - $e');
       _setError('Failed to sync pending operations: $e');
     } finally {
       _isSyncing = false;
       notifyListeners();
+    }
+  }
+
+  /// Refresh tasks and auto sync if needed (chỉ dùng cho refresh)
+  Future<void> refreshAndSyncIfNeeded() async {
+    try {
+      _clearError();
+      _setLoading(true);
+
+      await _checkConnectivity();
+
+      if (_isOnline && _pendingSyncCount > 0) {
+        // Chỉ auto sync khi refresh và có pending operations
+        await syncPendingOperations();
+      } else {
+        // Nếu không cần sync thì chỉ load tasks
+        await getAllTasks();
+      }
+
+      debugPrint('Tasks refreshed and synced if needed');
+    } catch (e) {
+      _setError('Failed to refresh tasks: $e');
+    } finally {
+      _setLoading(false);
     }
   }
 
@@ -250,8 +276,24 @@ class TaskProvider extends ChangeNotifier {
     try {
       final pendingOperations =
           await _taskRepository.getPendingSyncOperations();
+      final previousCount = _pendingSyncCount;
       _pendingSyncCount = pendingOperations.length;
-      debugPrint('Pending sync operations: $_pendingSyncCount');
+
+      debugPrint('=== PENDING COUNT UPDATE ===');
+      debugPrint('Previous count: $previousCount');
+      debugPrint('New count: $_pendingSyncCount');
+      debugPrint('Operations found: ${pendingOperations.length}');
+
+      if (pendingOperations.isNotEmpty) {
+        debugPrint('Pending operations details:');
+        for (int i = 0; i < pendingOperations.length; i++) {
+          final op = pendingOperations[i];
+          debugPrint(
+            '  $i: ${op['operation']} - ${op['task']['title']} (synced: ${op['synced']})',
+          );
+        }
+      }
+      debugPrint('=============================');
     } catch (e) {
       debugPrint('Provider: Error updating pending sync count - $e');
       _pendingSyncCount = 0;
@@ -321,6 +363,61 @@ class TaskProvider extends ChangeNotifier {
       return _pendingSyncCount > 0 ? Colors.orange : Colors.green;
     } else {
       return Colors.red;
+    }
+  }
+
+  /// Check if a specific task has pending sync
+  Future<bool> taskHasPendingSync(String taskId) async {
+    try {
+      return await _taskRepository.taskHasPendingSync(taskId);
+    } catch (e) {
+      debugPrint('Provider: Error checking task pending sync - $e');
+      return false;
+    }
+  }
+
+  /// Force clear all sync queue (for debugging)
+  Future<void> clearAllSyncQueue() async {
+    try {
+      await _taskRepository.clearAllSyncQueue();
+      await _updatePendingSyncCount();
+      notifyListeners();
+      debugPrint('All sync queue cleared from Provider');
+    } catch (e) {
+      debugPrint('Provider: Error clearing sync queue - $e');
+    }
+  }
+
+  /// Debug sync queue
+  Future<void> debugSyncQueue() async {
+    try {
+      await _taskRepository.debugSyncQueue();
+    } catch (e) {
+      debugPrint('Provider: Error debugging sync queue - $e');
+    }
+  }
+
+  /// Force mark all operations as completed (for debugging)
+  Future<void> forceMarkAllCompleted() async {
+    try {
+      await _taskRepository.forceMarkAllCompleted();
+      await _updatePendingSyncCount();
+      notifyListeners();
+      debugPrint('All operations force marked as completed from Provider');
+    } catch (e) {
+      debugPrint('Provider: Error force marking operations - $e');
+    }
+  }
+
+  /// Force clear completed operations (for debugging)
+  Future<void> forceClearCompleted() async {
+    try {
+      await _taskRepository.forceClearCompleted();
+      await _updatePendingSyncCount();
+      notifyListeners();
+      debugPrint('Force cleared completed operations from Provider');
+    } catch (e) {
+      debugPrint('Provider: Error force clearing completed operations - $e');
     }
   }
 }

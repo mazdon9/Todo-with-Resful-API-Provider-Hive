@@ -43,6 +43,13 @@ class _HomeScreenState extends State<HomeScreen> {
               /// Connectivity Status Indicator
               _buildConnectivityIndicator(taskProvider),
 
+              /// Debug Button (chỉ hiển thị khi có pending sync)
+              if (taskProvider.pendingSyncCount > 0)
+                IconButton(
+                  icon: Icon(Icons.bug_report, color: AppColorsPath.white),
+                  onPressed: () => _showDebugDialog(taskProvider),
+                ),
+
               /// Refresh Button
               IconButton(
                 icon: Icon(Icons.refresh, color: AppColorsPath.white),
@@ -296,102 +303,136 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Container _buildTaskItemWidget({required Task task}) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: AppColorsPath.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: Offset(0, 1),
-          ),
-        ],
-      ),
-      padding: EdgeInsets.all(12),
-      child: Row(
-        children: [
-          /// Task Status Indicator (cho local tasks)
-          if (task.id?.startsWith('local_') == true)
-            Container(
-              width: 4,
-              height: 40,
-              margin: EdgeInsets.only(right: 12),
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(2),
+  Widget _buildTaskItemWidget({required Task task}) {
+    return Consumer<TaskProvider>(
+      builder: (context, taskProvider, child) {
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: AppColorsPath.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 3,
+                offset: Offset(0, 1),
               ),
-            ),
+            ],
+          ),
+          padding: EdgeInsets.all(12),
+          child: Row(
+            children: [
+              /// Task Status Indicator (cho local tasks hoặc tasks có pending sync)
+              FutureBuilder<bool>(
+                future:
+                    task.id?.startsWith('local_') == true
+                        ? Future.value(true)
+                        : taskProvider.taskHasPendingSync(task.id ?? ''),
+                builder: (context, snapshot) {
+                  final hasPendingSync = snapshot.data ?? false;
 
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AppText(
-                  title: task.title,
-                  style: AppTextStyle.textFontSM13W600.copyWith(
-                    color: AppColorsPath.lavender,
-                  ),
-                ),
-                if (task.description.isNotEmpty)
-                  AppText(
-                    title: task.description,
-                    style: AppTextStyle.textFontR10W400.copyWith(
-                      color: AppColorsPath.black,
-                    ),
-                  ),
-
-                /// Local task indicator
-                if (task.id?.startsWith('local_') == true)
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    margin: EdgeInsets.only(top: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.orange, width: 0.5),
-                    ),
-                    child: Text(
-                      'Pending sync',
-                      style: TextStyle(
+                  if (hasPendingSync) {
+                    return Container(
+                      width: 4,
+                      height: 40,
+                      margin: EdgeInsets.only(right: 12),
+                      decoration: BoxDecoration(
                         color: Colors.orange,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w500,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    );
+                  }
+                  return SizedBox.shrink();
+                },
+              ),
+
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppText(
+                      title: task.title,
+                      style: AppTextStyle.textFontSM13W600.copyWith(
+                        color: AppColorsPath.lavender,
                       ),
                     ),
-                  ),
-              ],
-            ),
-          ),
+                    if (task.description.isNotEmpty)
+                      AppText(
+                        title: task.description,
+                        style: AppTextStyle.textFontR10W400.copyWith(
+                          color: AppColorsPath.black,
+                        ),
+                      ),
 
-          /// Action Buttons
-          _buildActionButton(
-            icon: Icons.edit,
-            onPressed: () {
-              Navigator.pushNamed(
-                context,
-                AppRoutes.editTodoScreenRouter,
-                arguments: task,
-              );
-            },
-          ),
+                    /// Pending sync indicator
+                    FutureBuilder<bool>(
+                      future:
+                          task.id?.startsWith('local_') == true
+                              ? Future.value(true)
+                              : taskProvider.taskHasPendingSync(task.id ?? ''),
+                      builder: (context, snapshot) {
+                        final hasPendingSync = snapshot.data ?? false;
 
-          _buildActionButton(
-            icon: Icons.delete,
-            color: Colors.red,
-            onPressed: () => _showDeleteConfirmDialog(task),
-          ),
+                        if (hasPendingSync) {
+                          return Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            margin: EdgeInsets.only(top: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: Colors.orange,
+                                width: 0.5,
+                              ),
+                            ),
+                            child: Text(
+                              'Pending sync',
+                              style: TextStyle(
+                                color: Colors.orange,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          );
+                        }
+                        return SizedBox.shrink();
+                      },
+                    ),
+                  ],
+                ),
+              ),
 
-          _buildActionButton(
-            icon: Icons.check_circle_outlined,
-            color: Colors.green,
-            onPressed: () => _showCompleteConfirmDialog(task),
+              /// Action Buttons
+              _buildActionButton(
+                icon: Icons.edit,
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.editTodoScreenRouter,
+                    arguments: task,
+                  );
+                },
+              ),
+
+              _buildActionButton(
+                icon: Icons.delete,
+                color: Colors.red,
+                onPressed: () => _showDeleteConfirmDialog(task),
+              ),
+
+              _buildActionButton(
+                icon: Icons.check_circle_outlined,
+                color: Colors.green,
+                onPressed: () => _showCompleteConfirmDialog(task),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -457,5 +498,73 @@ class _HomeScreenState extends State<HomeScreen> {
     if (confirmed == true) {
       context.read<TaskProvider>().toggleTaskCompletion(task);
     }
+  }
+
+  /// Show debug dialog
+  Future<void> _showDebugDialog(TaskProvider taskProvider) async {
+    await showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Text('Debug Sync Queue'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Pending sync operations: ${taskProvider.pendingSyncCount}',
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Debug Actions:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  await taskProvider.debugSyncQueue();
+                  Navigator.pop(context);
+                },
+                child: Text('Print Debug Info'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await taskProvider.forceMarkAllCompleted();
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Force Mark All Completed',
+                  style: TextStyle(color: Colors.orange),
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await taskProvider.forceClearCompleted();
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Force Clear Completed',
+                  style: TextStyle(color: Colors.blue),
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await taskProvider.clearAllSyncQueue();
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Clear All Queue',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Close'),
+              ),
+            ],
+          ),
+    );
   }
 }

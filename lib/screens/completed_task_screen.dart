@@ -237,17 +237,29 @@ class CompletedTasksScreen extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       child: Row(
         children: [
-          /// Task Status Indicator (cho local tasks)
-          if (task.id?.startsWith('local_') == true)
-            Container(
-              width: 4,
-              height: 40,
-              margin: EdgeInsets.only(right: 12),
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+          /// Task Status Indicator (cho local tasks hoặc tasks có pending sync)
+          FutureBuilder<bool>(
+            future:
+                task.id?.startsWith('local_') == true
+                    ? Future.value(true)
+                    : taskProvider.taskHasPendingSync(task.id ?? ''),
+            builder: (context, snapshot) {
+              final hasPendingSync = snapshot.data ?? false;
+
+              if (hasPendingSync) {
+                return Container(
+                  width: 4,
+                  height: 40,
+                  margin: EdgeInsets.only(right: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                );
+              }
+              return SizedBox.shrink();
+            },
+          ),
 
           Expanded(
             child: Column(
@@ -269,25 +281,40 @@ class CompletedTasksScreen extends StatelessWidget {
                     ),
                   ),
 
-                /// Local task indicator
-                if (task.id?.startsWith('local_') == true)
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    margin: EdgeInsets.only(top: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.orange, width: 0.5),
-                    ),
-                    child: Text(
-                      'Pending sync',
-                      style: TextStyle(
-                        color: Colors.orange,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                /// Pending sync indicator
+                FutureBuilder<bool>(
+                  future:
+                      task.id?.startsWith('local_') == true
+                          ? Future.value(true)
+                          : taskProvider.taskHasPendingSync(task.id ?? ''),
+                  builder: (context, snapshot) {
+                    final hasPendingSync = snapshot.data ?? false;
+
+                    if (hasPendingSync) {
+                      return Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        margin: EdgeInsets.only(top: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.orange, width: 0.5),
+                        ),
+                        child: Text(
+                          'Pending sync',
+                          style: TextStyle(
+                            color: Colors.orange,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      );
+                    }
+                    return SizedBox.shrink();
+                  },
+                ),
               ],
             ),
           ),

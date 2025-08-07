@@ -132,13 +132,14 @@ class StorageService {
         'task': task.toJson(),
         'timestamp': DateTime.now().microsecondsSinceEpoch,
         'synced': false,
+        'syncKey':
+            '${operation}_${task.id}_${DateTime.now().microsecondsSinceEpoch}', // Thêm syncKey vào data
       };
       debugPrint('Adding to sync queue: $syncItem');
       // create key for sync queue
-      final syncKey =
-          '${operation}_${task.id}_${DateTime.now().microsecondsSinceEpoch}';
+      final syncKey = syncItem['syncKey'] as String;
       await _syncQueueBox.put(syncKey, syncItem);
-      debugPrint('Added to sync queue: $syncItem');
+      debugPrint('Added to sync queue with key: $syncKey');
     } catch (e) {
       debugPrint('Error adding to sync queue: $e');
       throw Exception('Failed to add to sync queue: $e');
@@ -166,13 +167,38 @@ class StorageService {
   // mark sync or operation as synced (use after successful sync)
   Future<void> markSyncOperationCompleted(String synckey) async {
     try {
+      debugPrint('Attempting to mark sync operation as completed: $synckey');
+
+      // Debug: Print all keys in sync queue
+      final allKeys = _syncQueueBox.keys.toList();
+      debugPrint('All sync queue keys: $allKeys');
+
       final syncItem = _syncQueueBox.get(synckey);
       if (syncItem != null) {
+        debugPrint('Found sync item: $syncItem');
         syncItem['synced'] = true;
         await _syncQueueBox.put(synckey, syncItem);
-        debugPrint('Sync operation marked as completed: $synckey');
+        debugPrint('✅ Sync operation marked as completed: $synckey');
       } else {
-        debugPrint('Sync key not found: $synckey');
+        debugPrint('❌ Sync key not found: $synckey');
+        debugPrint('Available keys: $allKeys');
+
+        // Try to find by task ID in case key format is different
+        final taskIdFromKey = synckey.split('_')[1]; // Extract task ID from key
+        debugPrint('Trying to find by task ID: $taskIdFromKey');
+
+        for (final key in allKeys) {
+          final item = _syncQueueBox.get(key);
+          if (item != null && item['task']['id'] == taskIdFromKey) {
+            debugPrint('Found matching item by task ID: $key');
+            item['synced'] = true;
+            await _syncQueueBox.put(key, item);
+            debugPrint(
+              '✅ Sync operation marked as completed (by task ID): $key',
+            );
+            return;
+          }
+        }
       }
     } catch (e) {
       debugPrint('Error marking sync operation as completed: $e');
@@ -183,14 +209,49 @@ class StorageService {
   // clear completed sync operations
   Future<void> clearCompledSyncOperations() async {
     try {
+      debugPrint('=== CLEARING COMPLETED SYNC OPERATIONS ===');
+
       final allkeys = _syncQueueBox.keys.toList();
+      final allItems = _syncQueueBox.values.toList();
+
+      debugPrint('Total items before clearing: ${allItems.length}');
+      debugPrint('All keys: $allkeys');
+
+      // Debug: Print all items with their sync status
+      for (int i = 0; i < allItems.length; i++) {
+        final item = allItems[i];
+        final key = allkeys[i];
+        debugPrint(
+          'Item $i (Key: $key) - synced: ${item['synced']} - operation: ${item['operation']} - task: ${item['task']['title']}',
+        );
+      }
+
+      int clearedCount = 0;
+
       for (final key in allkeys) {
         final syncItem = _syncQueueBox.get(key);
         if (syncItem != null && syncItem['synced'] == true) {
           await _syncQueueBox.delete(key);
+          clearedCount++;
+          debugPrint('✓ Cleared completed sync operation: $key');
+        } else if (syncItem != null) {
+          debugPrint(
+            '✗ Keeping pending sync operation: $key (synced: ${syncItem['synced']})',
+          );
         }
       }
-      debugPrint('Completed sync operations cleared successfully');
+
+      debugPrint(
+        'Completed sync operations cleared successfully. Cleared: $clearedCount items',
+      );
+
+      // Debug: Print remaining items
+      final remainingItems =
+          _syncQueueBox.values
+              .where((item) => item['synced'] == false)
+              .toList();
+      debugPrint('Remaining pending operations: ${remainingItems.length}');
+      debugPrint('==========================================');
     } catch (e) {
       debugPrint('Error clearing completed sync operations: $e');
       throw Exception('Failed to clear completed sync operations: $e');
@@ -224,6 +285,113 @@ class StorageService {
       debugPrint('All local tasks cleared');
     } catch (e) {
       debugPrint('Error clearing all tasks: $e');
+    }
+  }
+
+  /// Check if task has pending sync operations
+  Future<bool> taskHasPendingSync(String taskId) async {
+    try {
+      final pendingOperations = await getPendingSyncOperations();
+      return pendingOperations.any((op) => op['task']['id'] == taskId);
+    } catch (e) {
+      debugPrint('Error checking pending sync for task: $e');
+      return false;
+    }
+  }
+
+  /// Update task directly without adding to sync queue (for online operations)
+  Future<Task> updateTaskDirectly(Task task) async {
+    try {
+      if (task.id == null) {
+        throw Exception('Task ID is required for updating');
+      }
+
+      // Update the task in Hive directly (không thêm vào sync queue)
+      await _taskBox.put(task.id!, task);
+      debugPrint('Task updated directly in local storage: ${task.title}');
+      return task;
+    } catch (e) {
+      debugPrint('Error updating task directly: $e');
+      throw Exception('Failed to update task directly: $e');
+    }
+  }
+
+  /// Delete task directly without adding to sync queue (for online operations)
+  Future<void> deleteTaskDirectly(String taskId) async {
+    try {
+      // check if task exists
+      final existingTask = _taskBox.get(taskId);
+      if (existingTask == null) {
+        throw Exception('Task with ID $taskId does not exist');
+      }
+
+      // Delete the task from Hive directly (không thêm vào sync queue)
+      await _taskBox.delete(taskId);
+      debugPrint('Task deleted directly from local storage: $taskId');
+    } catch (e) {
+      debugPrint('Error deleting task directly: $e');
+      throw Exception('Failed to delete task directly: $e');
+    }
+  }
+
+  /// Force clear all sync queue (for debugging)
+  Future<void> clearAllSyncQueue() async {
+    try {
+      await _syncQueueBox.clear();
+      debugPrint('All sync queue cleared');
+    } catch (e) {
+      debugPrint('Error clearing all sync queue: $e');
+    }
+  }
+
+  /// Debug: Print all sync queue items
+  Future<void> debugPrintSyncQueue() async {
+    try {
+      final allItems = _syncQueueBox.values.toList();
+      final allKeys = _syncQueueBox.keys.toList();
+
+      debugPrint('=== SYNC QUEUE DEBUG ===');
+      debugPrint('Total items in sync queue: ${allItems.length}');
+      debugPrint('All keys: $allKeys');
+
+      for (int i = 0; i < allItems.length; i++) {
+        final item = allItems[i];
+        final key = allKeys[i];
+        debugPrint('Item $i (Key: $key): $item');
+      }
+
+      final pendingItems =
+          allItems.where((item) => item['synced'] == false).toList();
+      debugPrint('Pending items: ${pendingItems.length}');
+
+      final completedItems =
+          allItems.where((item) => item['synced'] == true).toList();
+      debugPrint('Completed items: ${completedItems.length}');
+      debugPrint('======================');
+    } catch (e) {
+      debugPrint('Error debugging sync queue: $e');
+    }
+  }
+
+  /// Force mark all operations as completed (for debugging)
+  Future<void> forceMarkAllCompleted() async {
+    try {
+      final allKeys = _syncQueueBox.keys.toList();
+      int markedCount = 0;
+
+      for (final key in allKeys) {
+        final syncItem = _syncQueueBox.get(key);
+        if (syncItem != null && syncItem['synced'] == false) {
+          syncItem['synced'] = true;
+          await _syncQueueBox.put(key, syncItem);
+          markedCount++;
+          debugPrint('Force marked as completed: $key');
+        }
+      }
+
+      debugPrint('Force marked $markedCount operations as completed');
+    } catch (e) {
+      debugPrint('Error force marking operations as completed: $e');
     }
   }
 }

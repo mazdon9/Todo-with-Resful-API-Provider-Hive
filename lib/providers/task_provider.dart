@@ -2,60 +2,60 @@ import 'package:flutter/material.dart';
 import 'package:todo_with_resfulapi/models/task.dart';
 import 'package:todo_with_resfulapi/repositories/task_repository.dart';
 
-class TaskProvider with ChangeNotifier {
+class TaskProvider extends ChangeNotifier {
   final TaskRepository _taskRepository = TaskRepository();
 
   List<Task> _tasks = [];
+  bool _isLoading = false;
+  String _errorMessage = '';
+  bool _isOnline = true;
+  int _pendingSyncCount = 0;
+  bool _isSyncing = false;
 
+  // Getters
   List<Task> get tasks => _tasks;
+  bool get isLoading => _isLoading;
+  String get errorMessage => _errorMessage;
+  bool get isOnline => _isOnline;
+  int get pendingSyncCount => _pendingSyncCount;
+  bool get isSyncing => _isSyncing;
 
+  /// Getters for filtered tasks
   List<Task> get pendingTasks =>
       _tasks.where((task) => task.isPending).toList();
-
   List<Task> get completedTasks =>
       _tasks.where((task) => task.isCompleted).toList();
+  int get totalTasks => _tasks.length;
 
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
-  String? _error;
-  String? get error => _error;
-
-  bool get hasError => _error != null;
-
+  /// Initialize Provider
   Future<void> init() async {
     try {
       _setLoading(true);
-      _clearError();
       await _taskRepository.init();
-      await loadTasks();
+      await _checkConnectivity();
+      await getAllTasks();
+      await _updatePendingSyncCount();
     } catch (e) {
-      _setError('Failed to init $e');
+      _setError('Failed to initialize Provider: $e');
     } finally {
       _setLoading(false);
     }
   }
 
-  /// Get All Tasks From Repository
-  Future<void> loadTasks() async {
+  /// Get all tasks from Repository
+  Future<void> getAllTasks() async {
     try {
       _setLoading(true);
       _clearError();
+
       _tasks = await _taskRepository.getAllTasks();
+      await _checkConnectivity();
+      await _updatePendingSyncCount();
 
+      debugPrint('Tasks loaded: ${_tasks.length} tasks');
       notifyListeners();
-
-      /// Log
-      debugPrint('Tasks Loaded Successfully');
-      debugPrint('Tasks Loaded with length: ${_tasks.length}');
-      debugPrint(
-        'Tasks Loaded pendingTasks with length: ${pendingTasks.length}',
-      );
-      debugPrint(
-        'Tasks Loaded completedTasks with length: ${completedTasks.length}',
-      );
     } catch (e) {
-      _setError('Failed to load tasks. Please try again later. $e');
+      _setError('Failed to load tasks: $e');
     } finally {
       _setLoading(false);
     }
@@ -64,16 +64,19 @@ class TaskProvider with ChangeNotifier {
   /// Create new task
   Future<void> createTask(String title, String description) async {
     try {
-      _setLoading(true);
       _clearError();
+      _setLoading(true);
 
-      await _taskRepository.createTask(title, description);
-      _tasks = await _taskRepository.getAllTasks();
+      final newTask = await _taskRepository.createTask(title, description);
 
-      debugPrint('Task created successfully: ${pendingTasks.length}');
+      // Thêm task mới vào list local (để UI update ngay lập tức)
+      _tasks.add(newTask);
+      await _updatePendingSyncCount();
+
+      debugPrint('Task created successfully: ${newTask.title}');
       notifyListeners();
     } catch (e) {
-      _setError('Failed to create task. $e');
+      _setError('Failed to create task: $e');
     } finally {
       _setLoading(false);
     }
@@ -85,22 +88,21 @@ class TaskProvider with ChangeNotifier {
       _clearError();
       _setLoading(true);
 
-      await _taskRepository.updateTask(task);
-      final index = _tasks.indexWhere((t) => t.id == task.id);
+      final updatedTask = await _taskRepository.updateTask(task);
 
+      // Cập nhật task trong list local
+      final index = _tasks.indexWhere((t) => t.id == task.id);
       if (index != -1) {
-        _tasks[index] = _tasks[index].copyWith(
-          title: task.title,
-          description: task.description,
-        );
-        final updatedTask = _tasks[index];
+        _tasks[index] = updatedTask;
+        await _updatePendingSyncCount();
+
         debugPrint('Task updated successfully: ${updatedTask.title}');
         notifyListeners();
       } else {
         throw Exception('Task not found in local list');
       }
     } catch (e) {
-      _setError('Failed to update task. $e');
+      _setError('Failed to update task: $e');
     } finally {
       _setLoading(false);
     }
@@ -113,12 +115,15 @@ class TaskProvider with ChangeNotifier {
       _setLoading(true);
 
       await _taskRepository.deleteTask(taskId);
+
+      // Xóa task khỏi list local
       _tasks.removeWhere((task) => task.id == taskId);
+      await _updatePendingSyncCount();
 
       debugPrint('Task deleted successfully: $taskId');
       notifyListeners();
     } catch (e) {
-      _setError('Failed to delete task. $e');
+      _setError('Failed to delete task: $e');
     } finally {
       _setLoading(false);
     }
@@ -130,39 +135,192 @@ class TaskProvider with ChangeNotifier {
       _clearError();
       _setLoading(true);
 
-      await _taskRepository.toggleTaskCompletion(task);
-      final index = _tasks.indexWhere((t) => t.id == task.id);
+      final toggledTask = await _taskRepository.toggleTaskCompletion(task);
 
+      // Cập nhật task trong list local
+      final index = _tasks.indexWhere((t) => t.id == task.id);
       if (index != -1) {
-        _tasks[index] = _tasks[index].copyWith(
-          status: _tasks[index].isPending ? 'completada' : 'pendiente',
-        );
-        final updatedTask = _tasks[index];
+        _tasks[index] = toggledTask;
+        await _updatePendingSyncCount();
+
         debugPrint(
-          'Task completion toggled: ${updatedTask.title} - status: ${updatedTask.status}',
+          'Task completion toggled: ${toggledTask.title} - ${toggledTask.status}',
         );
         notifyListeners();
       } else {
-        _setError('Task not found in local list');
+        throw Exception('Task not found in local list');
       }
     } catch (e) {
-      _setError('Failed to toggle task completion. $e');
+      _setError('Failed to toggle task completion: $e');
     } finally {
       _setLoading(false);
     }
   }
 
+  /// Get single task by ID
+  Future<Task?> getTaskById(String taskId) async {
+    try {
+      return await _taskRepository.getTaskById(taskId);
+    } catch (e) {
+      debugPrint('Provider: Error getting task by ID - $e');
+      return null;
+    }
+  }
+
+  /// Refresh tasks (Pull to refresh)
+  Future<void> refreshTasks() async {
+    try {
+      _clearError();
+      _setLoading(true);
+
+      await _checkConnectivity();
+
+      if (_isOnline) {
+        // Nếu online, sync pending operations trước
+        await syncPendingOperations();
+      }
+
+      // Sau đó load lại all tasks
+      await getAllTasks();
+
+      debugPrint('Tasks refreshed successfully');
+    } catch (e) {
+      _setError('Failed to refresh tasks: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Sync pending operations
+  Future<void> syncPendingOperations() async {
+    try {
+      if (!_isOnline) {
+        debugPrint('Cannot sync: No internet connection');
+        return;
+      }
+
+      _isSyncing = true;
+      notifyListeners();
+
+      await _taskRepository.syncPendingOperations();
+      await _updatePendingSyncCount();
+
+      // Reload tasks after sync
+      await getAllTasks();
+
+      debugPrint('Sync completed successfully');
+    } catch (e) {
+      debugPrint('Provider: Error syncing pending operations - $e');
+      _setError('Failed to sync pending operations: $e');
+    } finally {
+      _isSyncing = false;
+      notifyListeners();
+    }
+  }
+
+  /// Clear all tasks (for testing/debugging)
+  Future<void> clearAllTasks() async {
+    try {
+      _setLoading(true);
+      await _taskRepository.clearAllTasks();
+      _tasks.clear();
+      _pendingSyncCount = 0;
+      notifyListeners();
+      debugPrint('All tasks cleared');
+    } catch (e) {
+      _setError('Failed to clear all tasks: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Check connectivity status
+  Future<void> _checkConnectivity() async {
+    try {
+      _isOnline = await _taskRepository.isOnline();
+      debugPrint('Connectivity status: ${_isOnline ? 'Online' : 'Offline'}');
+    } catch (e) {
+      debugPrint('Provider: Error checking connectivity - $e');
+      _isOnline = false;
+    }
+  }
+
+  /// Update pending sync count
+  Future<void> _updatePendingSyncCount() async {
+    try {
+      final pendingOperations =
+          await _taskRepository.getPendingSyncOperations();
+      _pendingSyncCount = pendingOperations.length;
+      debugPrint('Pending sync operations: $_pendingSyncCount');
+    } catch (e) {
+      debugPrint('Provider: Error updating pending sync count - $e');
+      _pendingSyncCount = 0;
+    }
+  }
+
+  /// Search tasks by title or description
+  List<Task> searchTasks(String query) {
+    if (query.isEmpty) return _tasks;
+
+    return _tasks.where((task) {
+      return task.title.toLowerCase().contains(query.toLowerCase()) ||
+          task.description.toLowerCase().contains(query.toLowerCase());
+    }).toList();
+  }
+
+  /// Get tasks by status
+  List<Task> getTasksByStatus(String status) {
+    return _tasks.where((task) => task.status == status).toList();
+  }
+
+  /// Private helper methods
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
   }
 
   void _setError(String error) {
-    _error = error;
+    _errorMessage = error;
+    debugPrint('Provider Error: $error');
     notifyListeners();
   }
 
   void _clearError() {
-    _error = null;
+    _errorMessage = '';
+  }
+
+  /// Manual connectivity refresh (for UI button)
+  Future<void> checkConnectivity() async {
+    await _checkConnectivity();
+    await _updatePendingSyncCount();
+    notifyListeners();
+  }
+
+  /// Get connectivity status text for UI
+  String get connectivityStatusText {
+    if (_isSyncing) {
+      return 'Syncing...';
+    }
+    if (_isOnline) {
+      return _pendingSyncCount > 0
+          ? 'Online - $_pendingSyncCount pending sync(s)'
+          : 'Online - All synced';
+    } else {
+      return _pendingSyncCount > 0
+          ? 'Offline - $_pendingSyncCount pending sync(s)'
+          : 'Offline';
+    }
+  }
+
+  /// Get connectivity status color for UI
+  Color get connectivityStatusColor {
+    if (_isSyncing) {
+      return Colors.blue;
+    }
+    if (_isOnline) {
+      return _pendingSyncCount > 0 ? Colors.orange : Colors.green;
+    } else {
+      return Colors.red;
+    }
   }
 }

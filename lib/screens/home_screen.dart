@@ -11,6 +11,9 @@ import 'package:todo_with_resfulapi/widgets/bottom_nav_bar_widget_home_screen.da
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -97,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           (context, index) => SizedBox(height: 21),
                       itemBuilder: (context, index) {
                         final task = taskProvider.pendingTasks[index];
-                        return _buildTaskItemWidget(task: task);
+                        return buildTaskItemWidget(task: task);
                       },
                     ),
                   ),
@@ -130,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Container _buildTaskItemWidget({required Task task}) {
+  Container buildTaskItemWidget({required Task task}) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),

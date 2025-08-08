@@ -8,6 +8,7 @@ import 'package:todo_with_resfulapi/models/task.dart';
 import 'package:todo_with_resfulapi/providers/task_provider.dart';
 import 'package:todo_with_resfulapi/routes/app_routes.dart';
 import 'package:todo_with_resfulapi/widgets/bottom_nav_bar_widget_home_screen.dart';
+import 'package:todo_with_resfulapi/widgets/dialog_widget_home_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,7 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
-    /// Get data
+    // Initialize data when widget is first built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TaskProvider>().init();
     });
@@ -40,23 +41,16 @@ class _HomeScreenState extends State<HomeScreen> {
               style: AppTextStyle.textFont24W600,
             ),
             actions: [
-              /// Connectivity Status Indicator
+              // Connectivity Status Indicator
               _buildConnectivityIndicator(taskProvider),
 
-              /// Debug Button (chỉ hiển thị khi có pending sync)
-              if (taskProvider.pendingSyncCount > 0)
-                IconButton(
-                  icon: Icon(Icons.bug_report, color: AppColorsPath.white),
-                  onPressed: () => _showDebugDialog(taskProvider),
-                ),
-
-              /// Refresh Button
+              // Refresh Button
               IconButton(
                 icon: Icon(Icons.refresh, color: AppColorsPath.white),
                 onPressed: () => taskProvider.refreshTasks(),
               ),
 
-              /// Calendar Icon
+              // Calendar Icon
               IconButton(
                 icon: Icon(
                   Icons.calendar_month_outlined,
@@ -73,16 +67,16 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  /// Connectivity Status Banner
+                  // Connectivity Status Banner
                   _buildConnectivityBanner(taskProvider),
 
-                  /// Body
-                  /// Case 1: Loading
+                  // Body Content
+                  // Case 1: Loading
                   if (taskProvider.isLoading)
                     Expanded(
                       child: const Center(child: CircularProgressIndicator()),
                     )
-                  /// Case 2: Error
+                  // Case 2: Error
                   else if (taskProvider.errorMessage.isNotEmpty)
                     Expanded(
                       child: Center(
@@ -92,14 +86,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             AppText(
                               title: 'Error loading tasks',
                               style: AppTextStyle.textFont24W600.copyWith(
-                                color: Colors.red,
+                                color: AppColorsPath.errorRed,
                               ),
                             ),
                             SizedBox(height: 8),
                             AppText(
                               title: taskProvider.errorMessage,
                               style: AppTextStyle.textFontR10W400.copyWith(
-                                color: Colors.red,
+                                color: AppColorsPath.errorRed,
                               ),
                             ),
                             SizedBox(height: 16),
@@ -111,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     )
-                  /// Case 3: Empty Data
+                  // Case 3: Empty Data
                   else if (taskProvider.pendingTasks.isEmpty)
                     Expanded(
                       child: Center(
@@ -121,27 +115,27 @@ class _HomeScreenState extends State<HomeScreen> {
                             Icon(
                               Icons.task_outlined,
                               size: 80,
-                              color: Colors.grey,
+                              color: AppColorsPath.grey,
                             ),
                             SizedBox(height: 16),
                             AppText(
                               title: 'No pending tasks',
                               style: AppTextStyle.textFont24W600.copyWith(
-                                color: Colors.grey,
+                                color: AppColorsPath.grey,
                               ),
                             ),
                             SizedBox(height: 8),
                             AppText(
                               title: 'Tap + to add your first task',
                               style: AppTextStyle.textFontR10W400.copyWith(
-                                color: Colors.grey,
+                                color: AppColorsPath.grey,
                               ),
                             ),
                           ],
                         ),
                       ),
                     )
-                  /// Case 4: Has Data
+                  // Case 4: Has Data
                   else
                     Expanded(
                       child: ListView.separated(
@@ -185,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Build connectivity status indicator in AppBar
+  // Build connectivity status indicator in AppBar
   Widget _buildConnectivityIndicator(TaskProvider taskProvider) {
     return Container(
       margin: EdgeInsets.only(right: 8),
@@ -202,13 +196,13 @@ class _HomeScreenState extends State<HomeScreen> {
               margin: EdgeInsets.only(left: 4),
               padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.orange,
+                color: AppColorsPath.warningOrange,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
                 '${taskProvider.pendingSyncCount}',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColorsPath.white,
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                 ),
@@ -219,10 +213,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Build connectivity status banner
+  // Build connectivity status banner
   Widget _buildConnectivityBanner(TaskProvider taskProvider) {
     if (taskProvider.isOnline && taskProvider.pendingSyncCount == 0) {
-      return SizedBox.shrink(); // Không hiển thị gì khi online và đã sync
+      return SizedBox.shrink(); // Hide banner when online and synced
     }
 
     return Container(
@@ -265,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(
                   color:
                       taskProvider.isSyncing
-                          ? Colors.grey
+                          ? AppColorsPath.grey
                           : taskProvider.connectivityStatusColor,
                   borderRadius: BorderRadius.circular(4),
                 ),
@@ -279,17 +273,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: CircularProgressIndicator(
                           strokeWidth: 1,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
+                            AppColorsPath.white,
                           ),
                         ),
                       )
                     else
-                      Icon(Icons.sync, color: Colors.white, size: 12),
+                      Icon(Icons.sync, color: AppColorsPath.white, size: 12),
                     SizedBox(width: 4),
                     Text(
                       taskProvider.isSyncing ? 'Syncing...' : 'Sync Now',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColorsPath.white,
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
@@ -312,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: AppColorsPath.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
+                color: AppColorsPath.shadowGrey,
                 spreadRadius: 1,
                 blurRadius: 3,
                 offset: Offset(0, 1),
@@ -322,7 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.all(12),
           child: Row(
             children: [
-              /// Task Status Indicator (cho local tasks hoặc tasks có pending sync)
+              // Task Status Indicator (for local tasks or tasks with pending sync)
               FutureBuilder<bool>(
                 future:
                     task.id?.startsWith('local_') == true
@@ -337,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 40,
                       margin: EdgeInsets.only(right: 12),
                       decoration: BoxDecoration(
-                        color: Colors.orange,
+                        color: AppColorsPath.warningOrange,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     );
@@ -365,7 +359,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
 
-                    /// Pending sync indicator
+                    // Pending sync indicator
                     FutureBuilder<bool>(
                       future:
                           task.id?.startsWith('local_') == true
@@ -382,17 +376,19 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             margin: EdgeInsets.only(top: 4),
                             decoration: BoxDecoration(
-                              color: Colors.orange.withOpacity(0.1),
+                              color: AppColorsPath.warningOrange.withOpacity(
+                                0.1,
+                              ),
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(
-                                color: Colors.orange,
+                                color: AppColorsPath.warningOrange,
                                 width: 0.5,
                               ),
                             ),
                             child: Text(
                               'Pending sync',
                               style: TextStyle(
-                                color: Colors.orange,
+                                color: AppColorsPath.warningOrange,
                                 fontSize: 9,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -406,7 +402,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              /// Action Buttons
+              // Action Buttons
               _buildActionButton(
                 icon: Icons.edit,
                 onPressed: () {
@@ -420,13 +416,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
               _buildActionButton(
                 icon: Icons.delete,
-                color: Colors.red,
+                color: AppColorsPath.errorRed,
                 onPressed: () => _showDeleteConfirmDialog(task),
               ),
 
               _buildActionButton(
                 icon: Icons.check_circle_outlined,
-                color: Colors.green,
+                color: AppColorsPath.successGreen,
                 onPressed: () => _showCompleteConfirmDialog(task),
               ),
             ],
@@ -448,25 +444,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Show delete confirmation dialog
+  // Show delete confirmation dialog
   Future<void> _showDeleteConfirmDialog(Task task) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text('Delete Task'),
-            content: Text('Are you sure you want to delete "${task.title}"?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text('Delete', style: TextStyle(color: Colors.red)),
-              ),
-            ],
-          ),
+    final confirmed = await DialogWidgetHomeScreen.showDeleteConfirmDialog(
+      context,
+      task,
     );
 
     if (confirmed == true) {
@@ -474,97 +456,15 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  /// Show complete confirmation dialog
+  // Show complete confirmation dialog
   Future<void> _showCompleteConfirmDialog(Task task) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text('Complete Task'),
-            content: Text('Mark "${task.title}" as completed?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text('Complete', style: TextStyle(color: Colors.green)),
-              ),
-            ],
-          ),
+    final confirmed = await DialogWidgetHomeScreen.showCompleteConfirmDialog(
+      context,
+      task,
     );
 
     if (confirmed == true) {
       context.read<TaskProvider>().toggleTaskCompletion(task);
     }
-  }
-
-  /// Show debug dialog
-  Future<void> _showDebugDialog(TaskProvider taskProvider) async {
-    await showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text('Debug Sync Queue'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Pending sync operations: ${taskProvider.pendingSyncCount}',
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'Debug Actions:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  await taskProvider.debugSyncQueue();
-                  Navigator.pop(context);
-                },
-                child: Text('Print Debug Info'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await taskProvider.forceMarkAllCompleted();
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'Force Mark All Completed',
-                  style: TextStyle(color: Colors.orange),
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await taskProvider.forceClearCompleted();
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'Force Clear Completed',
-                  style: TextStyle(color: Colors.blue),
-                ),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await taskProvider.clearAllSyncQueue();
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'Clear All Queue',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Close'),
-              ),
-            ],
-          ),
-    );
   }
 }

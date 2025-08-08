@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_with_resfulapi/constants/app_color_path.dart';
 import 'package:todo_with_resfulapi/models/task.dart';
 import 'package:todo_with_resfulapi/repositories/task_repository.dart';
 
@@ -357,12 +358,14 @@ class TaskProvider extends ChangeNotifier {
   /// Get connectivity status color for UI
   Color get connectivityStatusColor {
     if (_isSyncing) {
-      return Colors.blue;
+      return AppColorsPath.syncingBlue;
     }
     if (_isOnline) {
-      return _pendingSyncCount > 0 ? Colors.orange : Colors.green;
+      return _pendingSyncCount > 0
+          ? AppColorsPath.pendingOrange
+          : AppColorsPath.onlineGreen;
     } else {
-      return Colors.red;
+      return AppColorsPath.offlineRed;
     }
   }
 

@@ -172,7 +172,7 @@ class HomeTaskItemWidget extends StatelessWidget {
       task,
     );
 
-    if (confirmed == true) {
+    if (confirmed == true && context.mounted) {
       context.read<TaskProvider>().deleteTask(task.id ?? '');
     }
   }
@@ -184,7 +184,7 @@ class HomeTaskItemWidget extends StatelessWidget {
       task,
     );
 
-    if (confirmed == true) {
+    if (confirmed == true && context.mounted) {
       context.read<TaskProvider>().toggleTaskCompletion(task);
     }
   }

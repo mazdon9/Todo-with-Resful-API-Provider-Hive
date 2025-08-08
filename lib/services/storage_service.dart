@@ -128,7 +128,7 @@ class StorageService {
   Future<void> _addToSyncQueue(String operation, Task task) async {
     try {
       final syncItem = {
-        'operation': operation,
+        'operation': operation, // create , delete , put
         'task': task.toJson(),
         'timestamp': DateTime.now().microsecondsSinceEpoch,
         'synced': false,

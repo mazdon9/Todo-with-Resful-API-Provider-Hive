@@ -98,10 +98,10 @@ class TaskProvider extends ChangeNotifier {
         await _updatePendingSyncCount();
 
         debugPrint('Task updated successfully: ${updatedTask.title}');
-        notifyListeners();
       } else {
-        throw Exception('Task not found in local list');
+        _setError('Task not found in local list');
       }
+      notifyListeners();
     } catch (e) {
       _setError('Failed to update task: $e');
     } finally {
@@ -147,10 +147,10 @@ class TaskProvider extends ChangeNotifier {
         debugPrint(
           'Task completion toggled: ${toggledTask.title} - ${toggledTask.status}',
         );
-        notifyListeners();
       } else {
-        throw Exception('Task not found in local list');
+        _setError('Failed to toggle task completion: Task not found in local');
       }
+      notifyListeners();
     } catch (e) {
       _setError('Failed to toggle task completion: $e');
     } finally {

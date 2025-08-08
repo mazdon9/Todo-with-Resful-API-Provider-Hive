@@ -17,7 +17,7 @@ class TaskRepository {
   /// Get all tasks from the API or local hive
   Future<List<Task>> getAllTasks() async {
     try {
-      if (await _isOnline()) {
+      if (await isOnline()) {
         /// Get tasks from api and later save to local
         final tasks = await _apiService.getAllTasks();
         await _storageService.saveAllTasks(tasks);
@@ -35,7 +35,7 @@ class TaskRepository {
   /// Create new task
   Future<Task> createTask(String title, String description) async {
     try {
-      if (await _isOnline()) {
+      if (await isOnline()) {
         /// Online: Tạo task qua API
         await _apiService.createTask(title, description);
 
@@ -81,7 +81,7 @@ class TaskRepository {
   /// Update existing task
   Future<Task> updateTask(Task task) async {
     try {
-      if (await _isOnline()) {
+      if (await isOnline()) {
         /// Online: Cập nhật qua API và local storage (KHÔNG thêm vào sync queue)
         await _apiService.updateTask(task);
 
@@ -114,7 +114,7 @@ class TaskRepository {
   /// Delete task
   Future<void> deleteTask(String taskId) async {
     try {
-      if (await _isOnline()) {
+      if (await isOnline()) {
         /// Online: Xóa qua API và local storage (KHÔNG thêm vào sync queue)
         await _apiService.deleteTask(taskId);
 
@@ -144,7 +144,7 @@ class TaskRepository {
   /// Toggle task completion status
   Future<Task> toggleTaskCompletion(Task task) async {
     try {
-      if (await _isOnline()) {
+      if (await isOnline()) {
         /// Online: Toggle qua API và local storage (KHÔNG thêm vào sync queue)
         final updatedTask = Task(
           id: task.id,
@@ -234,7 +234,7 @@ class TaskRepository {
   /// Force sync all pending operations (sẽ implement sau)
   Future<void> syncPendingOperations() async {
     try {
-      if (!await _isOnline()) {
+      if (!await isOnline()) {
         debugPrint('Cannot sync: No internet connection');
         return;
       }
@@ -250,7 +250,7 @@ class TaskRepository {
       for (final operation in pendingOperations) {
         try {
           final operationType = operation['operation'] as String;
-          final taskData = operation['task'] as Map<String, dynamic>;
+          final taskData = operation['task'] as Map<dynamic, dynamic>;
           final timestamp = operation['timestamp'] as int;
 
           debugPrint(
@@ -342,7 +342,7 @@ class TaskRepository {
   }
 
   /// Check internet connectivity
-  Future<bool> _isOnline() async {
+  Future<bool> isOnline() async {
     try {
       final connectivityResult = await _connectivity.checkConnectivity();
       return connectivityResult != ConnectivityResult.none;
@@ -352,10 +352,10 @@ class TaskRepository {
     }
   }
 
-  /// Check if online (public method for UI)
-  Future<bool> isOnline() async {
-    return await _isOnline();
-  }
+  // /// Check if online (public method for UI)
+  // Future<bool> isOnline() async {
+  //   return await _isOnline();
+  // }
 
   /// Clear all tasks (for testing/debugging)
   Future<void> clearAllTasks() async {

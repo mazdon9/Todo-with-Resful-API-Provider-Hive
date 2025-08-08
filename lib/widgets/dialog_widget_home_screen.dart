@@ -6,14 +6,20 @@ class DialogWidgetHomeScreen {
   /// Show delete confirmation dialog
   static Future<bool?> showDeleteConfirmDialog(
     BuildContext context,
-    Task task,
-  ) async {
+    Task task, {
+    String? title,
+    String? message,
+    Color? confirmButtonColor,
+    String? confirmTextButton,
+  }) async {
     return await showDialog<bool>(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text('Delete Task'),
-            content: Text('Are you sure you want to delete "${task.title}"?'),
+            title: Text(title ?? 'Delete Task'),
+            content: Text(
+              message ?? 'Are you sure you want to delete "${task.title}"?',
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -22,8 +28,10 @@ class DialogWidgetHomeScreen {
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 child: Text(
-                  'Delete',
-                  style: TextStyle(color: AppColorsPath.errorRed),
+                  confirmTextButton ?? 'Delete',
+                  style: TextStyle(
+                    color: confirmButtonColor ?? AppColorsPath.errorRed,
+                  ),
                 ),
               ),
             ],

@@ -5,9 +5,11 @@ import 'package:todo_with_resfulapi/components/app_text.dart';
 import 'package:todo_with_resfulapi/components/app_text_style.dart';
 import 'package:todo_with_resfulapi/constants/app_color_path.dart';
 import 'package:todo_with_resfulapi/providers/task_provider.dart';
-import 'package:todo_with_resfulapi/widgets/completed_task_item_widget.dart';
+import 'package:todo_with_resfulapi/widgets/connectivity_banner_widget.dart';
+import 'package:todo_with_resfulapi/widgets/connectivity_indicator_widget.dart';
 import 'package:todo_with_resfulapi/widgets/connectivity_widget.dart';
 import 'package:todo_with_resfulapi/widgets/empty_state_widget.dart';
+import 'package:todo_with_resfulapi/widgets/task_item_widget_completed_screen.dart';
 
 class CompletedTasksScreen extends StatelessWidget {
   const CompletedTasksScreen({super.key});
@@ -28,7 +30,7 @@ class CompletedTasksScreen extends StatelessWidget {
             ),
             actions: [
               // Connectivity Status Indicator
-              ConnectivityWidget.buildConnectivityIndicator(taskProvider),
+              ConnectivityIndicatorWidget(),
 
               // Refresh Button
               IconButton(
@@ -44,8 +46,7 @@ class CompletedTasksScreen extends StatelessWidget {
               child: Column(
                 children: [
                   // Connectivity Status Banner
-                  ConnectivityWidget.buildConnectivityBanner(taskProvider),
-
+                  ConnectivityBannerWidget(),
                   // Body
                   Expanded(
                     child:

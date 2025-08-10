@@ -46,17 +46,15 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       description: _descriptionController.text.trim(),
     );
 
-    await context.read<TaskProvider>().updateTask(updatedTask);
-
     if (mounted) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Task updated successfully!')),
-      );
-    } else if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to update task')));
+      await context.read<TaskProvider>().updateTask(updatedTask);
+
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Task updated successfully!')),
+        );
+      }
     }
   }
 

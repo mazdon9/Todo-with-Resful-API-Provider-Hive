@@ -4,7 +4,6 @@ import 'package:todo_with_resfulapi/components/app_text.dart';
 import 'package:todo_with_resfulapi/components/app_text_style.dart';
 import 'package:todo_with_resfulapi/constants/app_color_path.dart';
 import 'package:todo_with_resfulapi/constants/app_data.dart';
-import 'package:todo_with_resfulapi/models/task.dart';
 import 'package:todo_with_resfulapi/providers/task_provider.dart';
 import 'package:todo_with_resfulapi/widgets/bottom_nav_bar_widget_home_screen.dart';
 
@@ -21,7 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
-    /// Get data
+    // Initialize data when widget is first built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TaskProvider>().loadTasks();
     });
@@ -42,6 +41,16 @@ class _HomeScreenState extends State<HomeScreen> {
               style: AppTextStyle.textFont24W600,
             ),
             actions: [
+              // Connectivity Status Indicator
+              ConnectivityIndicatorWidget(),
+
+              // Refresh Button
+              IconButton(
+                icon: Icon(Icons.refresh, color: AppColorsPath.white),
+                onPressed: () => taskProvider.refreshTasks(),
+              ),
+
+              // Calendar Icon
               IconButton(
                 icon: Icon(
                   Icons.calendar_month_outlined,

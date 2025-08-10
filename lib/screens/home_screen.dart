@@ -9,8 +9,8 @@ import 'package:todo_with_resfulapi/routes/app_routes.dart';
 import 'package:todo_with_resfulapi/widgets/bottom_nav_bar_widget_home_screen.dart';
 import 'package:todo_with_resfulapi/widgets/connectivity_widget.dart';
 import 'package:todo_with_resfulapi/widgets/empty_state_widget.dart';
-import 'package:todo_with_resfulapi/widgets/error_state_widget.dart';
-import 'package:todo_with_resfulapi/widgets/home_task_item_widget.dart';
+import 'package:todo_with_resfulapi/widgets/error_state_widget_home_screen.dart';
+import 'package:todo_with_resfulapi/widgets/task_item_widget_home_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

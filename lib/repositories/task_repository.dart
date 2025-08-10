@@ -36,14 +36,14 @@ class TaskRepository {
   Future<Task> createTask(String title, String description) async {
     try {
       if (await _isOnline()) {
-        /// Online: Tạo task qua API
+        /// Online: Create task via API
         await _apiService.createTask(title, description);
 
-        /// Sau khi tạo thành công, reload tất cả tasks từ API để có ID chính xác
+        /// After successful creation, reload all tasks from API to get correct ID
         final allTasks = await _apiService.getAllTasks();
         await _storageService.saveAllTasks(allTasks);
 
-        /// Tìm task vừa tạo (thường là task cuối cùng với title/description khớp)
+        /// Find the newly created task (usually the last task with matching title/description)
         final createdTask = allTasks.lastWhere(
           (task) => task.title == title && task.description == description,
           orElse:
@@ -58,7 +58,7 @@ class TaskRepository {
         debugPrint('Task created online: ${createdTask.title}');
         return createdTask;
       } else {
-        /// Offline: Tạo task local và thêm vào sync queue
+        /// Offline: Create task locally and add to sync queue
         final newTask = await _storageService.addTaskLocal(title, description);
         debugPrint('Task created offline: ${newTask.title}');
         return newTask;
@@ -66,7 +66,7 @@ class TaskRepository {
     } catch (e) {
       debugPrint('Error creating task in Repository: $e');
 
-      /// Nếu API fail, thử tạo local
+      /// If API fails, try to create locally
       try {
         final newTask = await _storageService.addTaskLocal(title, description);
         debugPrint('Task created offline (fallback): ${newTask.title}');
@@ -82,16 +82,16 @@ class TaskRepository {
   Future<Task> updateTask(Task task) async {
     try {
       if (await _isOnline()) {
-        /// Online: Cập nhật qua API và local storage (KHÔNG thêm vào sync queue)
+        /// Online: Update via API and local storage (WITHOUT adding to sync queue)
         await _apiService.updateTask(task);
 
-        /// Cập nhật local storage trực tiếp (không qua editTaskLocal để tránh sync queue)
+        /// Update local storage directly (not via editTaskLocal to avoid sync queue)
         await _storageService.updateTaskDirectly(task);
 
         debugPrint('Task updated online: ${task.title}');
         return task;
       } else {
-        /// Offline: Cập nhật local và thêm vào sync queue
+        /// Offline: Update locally and add to sync queue
         final updatedTask = await _storageService.editTaskLocal(task);
         debugPrint('Task updated offline: ${updatedTask.title}');
         return updatedTask;
@@ -99,7 +99,7 @@ class TaskRepository {
     } catch (e) {
       debugPrint('Error updating task in Repository: $e');
 
-      /// Nếu API fail, thử update local
+      /// If API fails, try to update locally
       try {
         final updatedTask = await _storageService.editTaskLocal(task);
         debugPrint('Task updated offline (fallback): ${updatedTask.title}');
@@ -115,22 +115,22 @@ class TaskRepository {
   Future<void> deleteTask(String taskId) async {
     try {
       if (await _isOnline()) {
-        /// Online: Xóa qua API và local storage (KHÔNG thêm vào sync queue)
+        /// Online: Delete via API and local storage (WITHOUT adding to sync queue)
         await _apiService.deleteTask(taskId);
 
-        /// Xóa khỏi local storage trực tiếp (không qua deleteTaskLocal để tránh sync queue)
+        /// Delete from local storage directly (not via deleteTaskLocal to avoid sync queue)
         await _storageService.deleteTaskDirectly(taskId);
 
         debugPrint('Task deleted online: $taskId');
       } else {
-        /// Offline: Xóa local và thêm vào sync queue
+        /// Offline: Delete locally and add to sync queue
         await _storageService.deleteTaskLocal(taskId);
         debugPrint('Task deleted offline: $taskId');
       }
     } catch (e) {
       debugPrint('Error deleting task in Repository: $e');
 
-      /// Nếu API fail, thử delete local
+      /// If API fails, try to delete locally
       try {
         await _storageService.deleteTaskLocal(taskId);
         debugPrint('Task deleted offline (fallback): $taskId');
@@ -145,7 +145,7 @@ class TaskRepository {
   Future<Task> toggleTaskCompletion(Task task) async {
     try {
       if (await _isOnline()) {
-        /// Online: Toggle qua API và local storage (KHÔNG thêm vào sync queue)
+        /// Online: Toggle via API and local storage (WITHOUT adding to sync queue)
         final updatedTask = Task(
           id: task.id,
           title: task.title,
@@ -155,7 +155,7 @@ class TaskRepository {
 
         await _apiService.updateTask(updatedTask);
 
-        /// Cập nhật local storage trực tiếp (không qua toggleTaskCompletedLocal để tránh sync queue)
+        /// Update local storage directly (not via toggleTaskCompletedLocal to avoid sync queue)
         await _storageService.updateTaskDirectly(updatedTask);
 
         debugPrint(
@@ -163,7 +163,7 @@ class TaskRepository {
         );
         return updatedTask;
       } else {
-        /// Offline: Toggle local và thêm vào sync queue
+        /// Offline: Toggle locally and add to sync queue
         final toggledTask = await _storageService.toggleTaskCompletedLocal(
           task,
         );
@@ -175,7 +175,7 @@ class TaskRepository {
     } catch (e) {
       debugPrint('Error toggling task completion in Repository: $e');
 
-      /// Nếu API fail, thử toggle local
+      /// If API fails, try to toggle locally
       try {
         final toggledTask = await _storageService.toggleTaskCompletedLocal(
           task,
@@ -221,7 +221,7 @@ class TaskRepository {
     }
   }
 
-  /// Get pending sync operations (để UI hiển thị trạng thái sync)
+  /// Get pending sync operations (for UI to display sync status)
   Future<List<Map<String, dynamic>>> getPendingSyncOperations() async {
     try {
       return await _storageService.getPendingSyncOperations();
@@ -259,7 +259,7 @@ class TaskRepository {
 
           switch (operationType) {
             case 'create':
-              // Sync create operation - chỉ sync local tasks
+              // Sync create operation - only sync local tasks
               final taskId = taskData['id'] as String?;
               if (taskId != null && taskId.startsWith('local_')) {
                 await _apiService.createTask(
@@ -278,14 +278,14 @@ class TaskRepository {
                 status: taskData['status'] as String,
               );
 
-              // Chỉ sync nếu task không phải local (có ID thật từ server)
+              // Only sync if task is not local (has real ID from server)
               if (task.id != null && !task.id!.startsWith('local_')) {
                 await _apiService.updateTask(task);
               }
               break;
 
             case 'delete':
-              // Sync delete operation - xóa khỏi API bất kể task type
+              // Sync delete operation - delete from API regardless of task type
               final taskId = taskData['id'] as String?;
               if (taskId != null) {
                 // Chỉ gọi API delete nếu không phải local task
@@ -384,35 +384,6 @@ class TaskRepository {
       debugPrint('All sync queue cleared from Repository');
     } catch (e) {
       debugPrint('Repository: Error clearing sync queue - $e');
-    }
-  }
-
-  /// Debug sync queue
-  Future<void> debugSyncQueue() async {
-    try {
-      await _storageService.debugPrintSyncQueue();
-    } catch (e) {
-      debugPrint('Repository: Error debugging sync queue - $e');
-    }
-  }
-
-  /// Force mark all operations as completed (for debugging)
-  Future<void> forceMarkAllCompleted() async {
-    try {
-      await _storageService.forceMarkAllCompleted();
-      debugPrint('All operations force marked as completed from Repository');
-    } catch (e) {
-      debugPrint('Repository: Error force marking operations - $e');
-    }
-  }
-
-  /// Force clear completed operations (for debugging)
-  Future<void> forceClearCompleted() async {
-    try {
-      await _storageService.clearCompledSyncOperations();
-      debugPrint('Force cleared completed operations from Repository');
-    } catch (e) {
-      debugPrint('Repository: Error force clearing completed operations - $e');
     }
   }
 }

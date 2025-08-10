@@ -24,8 +24,8 @@ class ApiService {
       debugPrint('API response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        /// Json api trả về dạng String '{id, title, description}'
-        /// truyền qua json.decode để chuyển thành Map
+        /// API returns JSON string format '{id, title, description}'
+        /// Parse via json.decode to convert to Map
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
 
         if (jsonResponse['status'] == 'success' &&

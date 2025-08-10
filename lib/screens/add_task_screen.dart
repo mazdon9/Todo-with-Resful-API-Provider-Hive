@@ -28,16 +28,18 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   Future<void> _addTask() async {
     if (!_formKey.currentState!.validate()) return;
 
-    await context.read<TaskProvider>().createTask(
-      _titleController.text.trim(),
-      _descriptionController.text.trim(),
-    );
-
     if (mounted) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Task added successfully!')));
+      await context.read<TaskProvider>().createTask(
+        _titleController.text.trim(),
+        _descriptionController.text.trim(),
+      );
+
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Task added successfully!')),
+        );
+      }
     }
   }
 

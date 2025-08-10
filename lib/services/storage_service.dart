@@ -133,7 +133,7 @@ class StorageService {
         'timestamp': DateTime.now().microsecondsSinceEpoch,
         'synced': false,
         'syncKey':
-            '${operation}_${task.id}_${DateTime.now().microsecondsSinceEpoch}', // Thêm syncKey vào data
+            '${operation}_${task.id}_${DateTime.now().microsecondsSinceEpoch}', // Add syncKey to operation data
       };
       debugPrint('Adding to sync queue: $syncItem');
       // create key for sync queue
@@ -306,7 +306,7 @@ class StorageService {
         throw Exception('Task ID is required for updating');
       }
 
-      // Update the task in Hive directly (không thêm vào sync queue)
+      // Update the task in Hive directly (without adding to sync queue)
       await _taskBox.put(task.id!, task);
       debugPrint('Task updated directly in local storage: ${task.title}');
       return task;
@@ -325,7 +325,7 @@ class StorageService {
         throw Exception('Task with ID $taskId does not exist');
       }
 
-      // Delete the task from Hive directly (không thêm vào sync queue)
+      // Delete the task from Hive directly (without adding to sync queue)
       await _taskBox.delete(taskId);
       debugPrint('Task deleted directly from local storage: $taskId');
     } catch (e) {
@@ -341,57 +341,6 @@ class StorageService {
       debugPrint('All sync queue cleared');
     } catch (e) {
       debugPrint('Error clearing all sync queue: $e');
-    }
-  }
-
-  /// Debug: Print all sync queue items
-  Future<void> debugPrintSyncQueue() async {
-    try {
-      final allItems = _syncQueueBox.values.toList();
-      final allKeys = _syncQueueBox.keys.toList();
-
-      debugPrint('=== SYNC QUEUE DEBUG ===');
-      debugPrint('Total items in sync queue: ${allItems.length}');
-      debugPrint('All keys: $allKeys');
-
-      for (int i = 0; i < allItems.length; i++) {
-        final item = allItems[i];
-        final key = allKeys[i];
-        debugPrint('Item $i (Key: $key): $item');
-      }
-
-      final pendingItems =
-          allItems.where((item) => item['synced'] == false).toList();
-      debugPrint('Pending items: ${pendingItems.length}');
-
-      final completedItems =
-          allItems.where((item) => item['synced'] == true).toList();
-      debugPrint('Completed items: ${completedItems.length}');
-      debugPrint('======================');
-    } catch (e) {
-      debugPrint('Error debugging sync queue: $e');
-    }
-  }
-
-  /// Force mark all operations as completed (for debugging)
-  Future<void> forceMarkAllCompleted() async {
-    try {
-      final allKeys = _syncQueueBox.keys.toList();
-      int markedCount = 0;
-
-      for (final key in allKeys) {
-        final syncItem = _syncQueueBox.get(key);
-        if (syncItem != null && syncItem['synced'] == false) {
-          syncItem['synced'] = true;
-          await _syncQueueBox.put(key, syncItem);
-          markedCount++;
-          debugPrint('Force marked as completed: $key');
-        }
-      }
-
-      debugPrint('Force marked $markedCount operations as completed');
-    } catch (e) {
-      debugPrint('Error force marking operations as completed: $e');
     }
   }
 }

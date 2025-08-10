@@ -70,7 +70,7 @@ class TaskProvider extends ChangeNotifier {
 
       final newTask = await _taskRepository.createTask(title, description);
 
-      // Thêm task mới vào list local (để UI update ngay lập tức)
+      // Add new task to local list (for immediate UI update)
       _tasks.add(newTask);
       await _updatePendingSyncCount();
 
@@ -91,7 +91,7 @@ class TaskProvider extends ChangeNotifier {
 
       final updatedTask = await _taskRepository.updateTask(task);
 
-      // Cập nhật task trong list local
+      // Update task in local list
       final index = _tasks.indexWhere((t) => t.id == task.id);
       if (index != -1) {
         _tasks[index] = updatedTask;
@@ -138,7 +138,7 @@ class TaskProvider extends ChangeNotifier {
 
       final toggledTask = await _taskRepository.toggleTaskCompletion(task);
 
-      // Cập nhật task trong list local
+      // Update task in local list
       final index = _tasks.indexWhere((t) => t.id == task.id);
       if (index != -1) {
         _tasks[index] = toggledTask;
@@ -176,7 +176,7 @@ class TaskProvider extends ChangeNotifier {
 
       await _checkConnectivity();
 
-      // Chỉ load lại tasks, KHÔNG auto sync
+      // Only reload tasks, NO auto sync
       await getAllTasks();
 
       debugPrint('Tasks refreshed successfully');
@@ -218,30 +218,6 @@ class TaskProvider extends ChangeNotifier {
     } finally {
       _isSyncing = false;
       notifyListeners();
-    }
-  }
-
-  /// Refresh tasks and auto sync if needed (chỉ dùng cho refresh)
-  Future<void> refreshAndSyncIfNeeded() async {
-    try {
-      _clearError();
-      _setLoading(true);
-
-      await _checkConnectivity();
-
-      if (_isOnline && _pendingSyncCount > 0) {
-        // Chỉ auto sync khi refresh và có pending operations
-        await syncPendingOperations();
-      } else {
-        // Nếu không cần sync thì chỉ load tasks
-        await getAllTasks();
-      }
-
-      debugPrint('Tasks refreshed and synced if needed');
-    } catch (e) {
-      _setError('Failed to refresh tasks: $e');
-    } finally {
-      _setLoading(false);
     }
   }
 
@@ -388,39 +364,6 @@ class TaskProvider extends ChangeNotifier {
       debugPrint('All sync queue cleared from Provider');
     } catch (e) {
       debugPrint('Provider: Error clearing sync queue - $e');
-    }
-  }
-
-  /// Debug sync queue
-  Future<void> debugSyncQueue() async {
-    try {
-      await _taskRepository.debugSyncQueue();
-    } catch (e) {
-      debugPrint('Provider: Error debugging sync queue - $e');
-    }
-  }
-
-  /// Force mark all operations as completed (for debugging)
-  Future<void> forceMarkAllCompleted() async {
-    try {
-      await _taskRepository.forceMarkAllCompleted();
-      await _updatePendingSyncCount();
-      notifyListeners();
-      debugPrint('All operations force marked as completed from Provider');
-    } catch (e) {
-      debugPrint('Provider: Error force marking operations - $e');
-    }
-  }
-
-  /// Force clear completed operations (for debugging)
-  Future<void> forceClearCompleted() async {
-    try {
-      await _taskRepository.forceClearCompleted();
-      await _updatePendingSyncCount();
-      notifyListeners();
-      debugPrint('Force cleared completed operations from Provider');
-    } catch (e) {
-      debugPrint('Provider: Error force clearing completed operations - $e');
     }
   }
 }

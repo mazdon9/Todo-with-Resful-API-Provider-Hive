@@ -7,7 +7,8 @@ import 'package:todo_with_resfulapi/constants/app_data.dart';
 import 'package:todo_with_resfulapi/providers/task_provider.dart';
 import 'package:todo_with_resfulapi/routes/app_routes.dart';
 import 'package:todo_with_resfulapi/widgets/bottom_nav_bar_widget_home_screen.dart';
-import 'package:todo_with_resfulapi/widgets/connectivity_widget.dart';
+import 'package:todo_with_resfulapi/widgets/connectivity_banner_widget.dart';
+import 'package:todo_with_resfulapi/widgets/connectivity_indicator_widget.dart';
 import 'package:todo_with_resfulapi/widgets/empty_state_widget.dart';
 import 'package:todo_with_resfulapi/widgets/error_state_widget_home_screen.dart';
 import 'package:todo_with_resfulapi/widgets/task_item_widget_home_screen.dart';
@@ -44,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             actions: [
               // Connectivity Status Indicator
-              ConnectivityWidget.buildConnectivityIndicator(taskProvider),
+              ConnectivityIndicatorWidget(),
 
               // Refresh Button
               IconButton(
@@ -70,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 children: [
                   // Connectivity Status Banner
-                  ConnectivityWidget.buildConnectivityBanner(taskProvider),
+                  ConnectivityBannerWidget(),
 
                   // Body Content
                   // Case 1: Loading

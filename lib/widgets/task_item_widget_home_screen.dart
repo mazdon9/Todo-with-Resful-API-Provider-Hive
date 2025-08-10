@@ -152,7 +152,7 @@ class HomeTaskItemWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(
+  IconButton _buildActionButton(
     BuildContext context, {
     required IconData icon,
     required VoidCallback onPressed,
